@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    build: .
+    container_name: pg-db
+    restart: always
+    environment:
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
