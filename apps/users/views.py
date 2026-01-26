@@ -33,7 +33,8 @@ class PersonFaceViewSet(ModelViewSet):
             face_similarities = []
             for known_embedding in users_em:
                 similarity = utils.cosine_similarity(embedding, known_embedding)
-                face_similarities.append(similarity)
+                similarity_percent = utils.get_percentage(similarity, threshold=0.5)
+                face_similarities.append(similarity_percent)
 
             if len(face_similarities) > 0:
                 obj = MinScore.objects.first()
