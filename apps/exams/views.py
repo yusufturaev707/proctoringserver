@@ -63,7 +63,7 @@ class CheckCandidateAPIView(APIView):
                 json={"imei": imei, "test_key": test_key},
                 timeout=5
             )
-
+            data_res = res.json()
             if res.status_code in [400, 404, 401, 405, 403, 500]:
                 data = {
                     "status": "error",
@@ -74,7 +74,6 @@ class CheckCandidateAPIView(APIView):
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
             
             elif res.status_code == 200:
-                data_res = res.json()
                 response_status = data_res.get('status', False)
                 if not response_status:
                     data = {
