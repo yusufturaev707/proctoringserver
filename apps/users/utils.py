@@ -30,4 +30,4 @@ def get_percentage(cosine_score, threshold=0.5):
         # Threshold dan past: [0.0, threshold] -> [0%, 89%]
         percentage = (cosine_score / threshold) * 89.0
     
-    return round(percentage, 2)
+    return round(percentage)

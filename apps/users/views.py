@@ -28,8 +28,6 @@ class PersonFaceViewSet(ModelViewSet):
             embedding = request.data['embedding']
             embedding = np.array(ast.literal_eval(embedding))
 
-            data = {"status": "", "verified": False, "message": ""}
-
             face_similarities = []
             for known_embedding in users_em:
                 similarity = utils.cosine_similarity(embedding, known_embedding)
@@ -38,15 +36,18 @@ class PersonFaceViewSet(ModelViewSet):
 
             if len(face_similarities) > 0:
                 obj = MinScore.objects.first()
+                if not obj:
+                    required_score = 88
+                else:
+                    required_score = obj.score
                 best_match_index = np.argmax(face_similarities)
                 similarity = face_similarities[best_match_index]
-                similarity = round(similarity * 100)
-                if similarity > obj.score:
-                    data = {"status": status.HTTP_200_OK, "verified": True, "message": "Find face!"}
+                if similarity >= required_score:
+                    data = {"status": status.HTTP_200_OK, "verified": True, "message": f"Xodim aniqlandi! [{similarity}%]", "score": similarity}
                 else:
-                    data = {"status": status.HTTP_404_NOT_FOUND, "verified": False, "message": "Not found!"}
+                    data = {"status": status.HTTP_404_NOT_FOUND, "verified": False, "message": f"Aniqlanmadi! [{similarity}%]", "score": similarity}
             else:
-                data = {"status": status.HTTP_400_BAD_REQUEST, "verified": False, "message": "Not face detected!"}
+                data = {"status": status.HTTP_400_BAD_REQUEST, "verified": False, "message": f"Kamerada yuz topilmadi! [0%]", "score": 0}
             print(data)
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
