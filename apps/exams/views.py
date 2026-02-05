@@ -59,11 +59,11 @@ class CheckCandidateAPIView(APIView):
 
             # Flask API ga so'rov
             res = requests.get(
-                f"http://127.0.0.1:5000/api/check-candidate-exam/",
-                json={"imei": imei, "test_key": test_key},
+                f"https://apiv1.uzbmb.uz/site/proctoring-person-exam?imie={imei}",
                 timeout=5
             )
             data_res = res.json()
+            print(data_res)
             if res.status_code in [400, 404, 401, 405, 403, 500]:
                 data = {
                     "status": "error",
@@ -74,8 +74,8 @@ class CheckCandidateAPIView(APIView):
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
             
             elif res.status_code == 200:
-                response_status = data_res.get('status', False)
-                if not response_status:
+                response_status = data_res.get('status')
+                if response_status != 1:
                     data = {
                         "status": "error",
                         "score": 0,
@@ -84,20 +84,19 @@ class CheckCandidateAPIView(APIView):
                     }
                     return Response(data, status=status.HTTP_400_BAD_REQUEST)
                 response_data = data_res.get('data', {})
+                print(f"response_data: {response_data}")
                 data = {
-                    "status": "success",
+                    "status": response_data.get('status', False),
                     "score": int(score.score),
                     "data": {
                         "image_base64": response_data.get('image_base64', ''),
-                        "imei": response_data.get('imei', ''),
+                        "imei": response_data.get('imie', ''),
                         "test_link": response_data.get('test_link', ''),
-                        "is_enrolled": response_data.get('is_enrolled', False),
-                        "is_finished": response_data.get('is_finished', False),
-                        "is_cheating": response_data.get('is_cheating', False),
-                        "is_blocked": response_data.get('is_blocked', False),
-                        "warning_text": test.warning_instructions.strip() if test.warning_instructions else "",
+                        "is_enrolled": response_data.get('status', False),
+                        "warning_text": response_data.get('message', 'Xatolik yuz berdi'),
                     }
                 }
+                print(f"data: {data}")
                 return Response(data, status=status.HTTP_200_OK)
             
         except requests.RequestException as e:
