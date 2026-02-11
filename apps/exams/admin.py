@@ -6,6 +6,7 @@ import requests
 
 from apps.exams.models import Test
 from apps.settings.models import Settings
+from core.api_service import TestAPIClient
 
 
 @admin.register(Test)
@@ -22,36 +23,37 @@ class TestAdmin(admin.ModelAdmin):
 
     def import_from_api(self, request):
         try:
-            response = requests.get('http://127.0.0.1:5000/api/list-tests/', timeout=10)
-            response.raise_for_status()
-            data = response.json()
+            student_api = TestAPIClient()
+            data = student_api.get_test_list()
+
+            if data.get('status') != 1:
+                self.message_user(request, f"{data['message']}", messages.ERROR)
+                return redirect('..')
+
             items = data.get('data', [])
 
             existing_keys = set(Test.objects.values_list('key', flat=True))
             default_setting = Settings.objects.first()
 
             for item in items:
-                key = item['key']
+                key = ''
                 if key not in existing_keys:
                     Test.objects.create(
-                        name=item['name'],
-                        key=item['key'],
+                        name=item['title'],
+                        key=key,
                         setting_mode=default_setting,
                         status=item['status'],
-                        warning_instructions=item['warning_instructions']
                     )
                 else:
                     Test.objects.filter(key=key).update(
-                        name=item['name'],
+                        name=item['title'],
                         status=item['status'],
-                        warning_instructions=item['warning_instructions']
                     )
-
-            self.message_user(request, "Ma'lumotlar muvaffaqiyatli yuklandi.", messages.SUCCESS)
+            self.message_user(request, f"{data['message']}.", messages.SUCCESS)
 
         except requests.RequestException as e:
             self.message_user(request, f"API xatosi: {e}", messages.ERROR)
         except Exception as e:
             self.message_user(request, f"Xatolik: {e}", messages.ERROR)
 
-        return redirect("..")
+        return redirect('..')

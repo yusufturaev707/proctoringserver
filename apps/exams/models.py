@@ -5,8 +5,7 @@ class Test(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     key = models.CharField(max_length=100, blank=True, null=True)
     setting_mode = models.ForeignKey("settings.Settings", on_delete=models.SET_NULL, blank=True, null=True)
-    status = models.BooleanField(default=True)
-    warning_instructions = models.TextField(blank=True, null=True)
+    status = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):
         return self.name

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from apps.notification import models
 
-@admin.register(models.WarningNotif)
+@admin.register(models.WarningNotification)
 class WarningNotifAdmin(admin.ModelAdmin):
-    list_display = ['exam', 'pc', 'imei', 'text', 'created_at']
+    list_display = ['exam', 'imei', 'description', 'created_at']

@@ -54,10 +54,15 @@ class Settings(BaseModel):
     is_check_face_candidate = models.BooleanField(default=False)
     is_screen_record = models.BooleanField(default=False)
     is_face_identification = models.BooleanField(default=False) #Test jarayonida identifikatsiya qilib turish
-    timer_face_id = models.PositiveSmallIntegerField(default=10)
     is_detect_cheating = models.BooleanField(default=False)
     is_detect_monitor = models.BooleanField(default=False)
     is_detect_camera = models.BooleanField(default=False)
+    timer_face_id = models.PositiveSmallIntegerField(default=10)
+    detection_interval = models.PositiveSmallIntegerField(default=0)
+    detection_max_fail = models.PositiveSmallIntegerField(default=0)
+    identification_interval = models.PositiveSmallIntegerField(default=0)
+    identification_max_fail = models.PositiveSmallIntegerField(default=0)
+    warning_timeout = models.PositiveSmallIntegerField(default=0)
 
 
     def __str__(self):
