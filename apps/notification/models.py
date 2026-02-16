@@ -35,6 +35,6 @@ class WarningNotification(BaseModel):
         verbose_name_plural = 'Notifications'
         ordering = ('-id',)
         indexes = [
-            models.Index(fields=['exam', 'warning_type']),
+            models.Index(fields=['exam', 'warning_type', 'ip_address', 'mac_address']),
         ]
         db_table = 'warning_notification'

@@ -7,7 +7,6 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from apps.settings.models import MinScore
 from apps.users import utils
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
@@ -23,6 +22,7 @@ class PersonFaceViewSet(ModelViewSet):
     @action(methods=['post'], detail=False)
     def face_identification(self, request):
         try:
+            required_score = 88
             users = User.objects.all().order_by('id')
             users_em = [np.array(ast.literal_eval(user.embedding)) for user in users]
             embedding = request.data['embedding']
@@ -35,11 +35,6 @@ class PersonFaceViewSet(ModelViewSet):
                 face_similarities.append(similarity_percent)
 
             if len(face_similarities) > 0:
-                obj = MinScore.objects.first()
-                if not obj:
-                    required_score = 88
-                else:
-                    required_score = obj.score
                 best_match_index = np.argmax(face_similarities)
                 similarity = face_similarities[best_match_index]
                 if similarity >= required_score:
@@ -48,7 +43,6 @@ class PersonFaceViewSet(ModelViewSet):
                     data = {"status": status.HTTP_404_NOT_FOUND, "verified": False, "message": f"Aniqlanmadi! [{similarity}%]", "score": similarity}
             else:
                 data = {"status": status.HTTP_400_BAD_REQUEST, "verified": False, "message": f"Kamerada yuz topilmadi! [0%]", "score": 0}
-            print(data)
             return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             data = {"status": status.HTTP_400_BAD_REQUEST, "verified": False, "message": str(e)}

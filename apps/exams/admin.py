@@ -11,7 +11,7 @@ from core.api_service import TestAPIClient
 
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
-    list_display = ['name', 'setting_mode', 'status']
+    list_display = ['id', 'name', 'setting_mode', 'status']
     change_list_template = "exams/test_change_list.html"
 
     def get_urls(self):
