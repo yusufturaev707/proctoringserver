@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from apps.users import utils
+from core import utils
 from apps.users.models import User
 from apps.users.serializers import UserSerializer
 
@@ -22,7 +22,7 @@ class PersonFaceViewSet(ModelViewSet):
     @action(methods=['post'], detail=False)
     def face_identification(self, request):
         try:
-            required_score = 88
+            required_score = 70
             users = User.objects.all().order_by('id')
             users_em = [np.array(ast.literal_eval(user.embedding)) for user in users]
             embedding = request.data['embedding']

@@ -5,6 +5,7 @@ class Test(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     key = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     setting_mode = models.ForeignKey("settings.Settings", on_delete=models.SET_NULL, blank=True, null=True)
+    site_url = models.CharField(max_length=255, blank=True, default='https://ntest.uzbmb.uz/login')
     status = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):

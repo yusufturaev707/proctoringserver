@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from core.models.base import BaseModel
 
 
@@ -47,9 +47,9 @@ class Settings(BaseModel):
     identification_interval = models.PositiveSmallIntegerField(verbose_name="Interval", default=10)
     identification_max_fail = models.PositiveSmallIntegerField(verbose_name="Max Fail", default=3)
     warning_timeout = models.PositiveSmallIntegerField(verbose_name="Kutish vaqti", default=5)
-    identity_min_score = models.PositiveSmallIntegerField(verbose_name="Score1", default=88)
-    identify_min_score_test = models.PositiveSmallIntegerField(verbose_name="Score2", default=40)
-    quit_password = models.CharField(max_length=15, blank=True, null=True)
+    identity_min_score_staff = models.PositiveSmallIntegerField(verbose_name="Score staff", default=70)
+    identity_min_score_candidate = models.PositiveSmallIntegerField(verbose_name="Score candidate", default=70)
+    identity_min_score_test = models.PositiveSmallIntegerField(verbose_name="Score test", default=70)
     is_screen_record = models.BooleanField(verbose_name="Ekran yozish", default=False)
     is_detect_monitor = models.BooleanField(verbose_name="Ekran tekshiruvi", default=False)
     is_detect_camera = models.BooleanField(verbose_name="Kamera tekshiruvi", default=False)
@@ -69,3 +69,24 @@ class Settings(BaseModel):
         verbose_name_plural = 'Sozlamalar'
         db_table = 'settings'
 
+
+class ExitPassword(BaseModel):
+    name = models.CharField(verbose_name="Dasturdan chiqish", max_length=255, blank=True, null=True)
+    password = models.CharField(max_length=120, unique=True, blank=True, default='123')
+    is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        if self.is_active:
+            with transaction.atomic():
+                ExitPassword.objects.filter(is_active=True).exclude(pk=self.pk).update(is_active=False)
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name} - {'Active' if self.is_active else 'Inactive'}"
+
+    class Meta:
+        db_table = 'exitpassword'
+        verbose_name = 'Exit Password'
+        verbose_name_plural = 'Exit Passwords'
+        ordering = ['id']

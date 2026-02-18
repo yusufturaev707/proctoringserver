@@ -6,8 +6,10 @@ from core.models.base import BaseModel
 class WarningNotification(BaseModel):
     class WarningType(models.TextChoices):
         NO_FACE = 'no_face', _('Yuz aniqlanmadi')
-        MULTIPLE_FACES = 'multiple_faces', _('Bir nechta yuz aniqlandi')
-        PHONE_DETECTED = 'phone_detected', _('Telefon aniqlandi')
+        DETECT_MORE_MONITOR = 'multiple_monitor', _('Ortiqcha monitor')
+        DETECT_RDP = 'rdp_detected', _('RDP detected')
+        MULTIPLE_FACES = 'multiple_faces', _('Bir nechta yuz')
+        PHONE_DETECTED = 'phone_detected', _('Telefon')
         FORBIDDEN_OBJECT = 'forbidden_object', _('Taqiqlangan buyum')
         TAB_SWITCH = 'tab_switch', _('Tab yoki oyna almashdi')
         LOOKING_AWAY = 'looking_away', _('Chetga qarash')

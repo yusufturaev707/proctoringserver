@@ -4,11 +4,6 @@ import re
 import cv2
 from django.conf import settings
 
-
-def cosine_similarity(embedding1, embedding2):
-    return np.dot(embedding1, embedding2) / (np.linalg.norm(embedding1) * np.linalg.norm(embedding2))
-
-
 class Base64ImageConverter:
     def __init__(self, base64_string: str):
         self.base64_string = base64_string
@@ -53,4 +48,14 @@ class Base64ImageConverter:
         if not t:
             is_success = False
         return embeddings_list, is_success
+
+
+def cosine_similarity(embedding1, embedding2):
+    return np.dot(embedding1, embedding2) / (np.linalg.norm(embedding1) * np.linalg.norm(embedding2))
+
+
+def get_percentage(cosine_score, threshold=0.5):
+    normalized = (cosine_score + 1) / 2
+    similarity_score = round(normalized * 100)
+    return round(similarity_score)
 

@@ -16,4 +16,4 @@ class TestSerializer(serializers.ModelSerializer):
     setting_mode = SettingSerializer(read_only=True)
     class Meta:
         model = Test
-        fields = ['id', 'name', 'key', 'setting_mode', 'status']
+        fields = ['id', 'name', 'key', 'setting_mode', 'site_url', 'status']
