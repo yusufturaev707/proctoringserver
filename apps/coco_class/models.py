@@ -47,3 +47,34 @@ class CocoObject(BaseModel):
         verbose_name_plural = 'Coco objects'
         verbose_name = 'Coco object'
         ordering = ['id']
+
+
+
+class RdpObject(BaseModel):
+    name = models.CharField(max_length=100, unique=True, blank=True)
+    code = models.CharField(max_length=100, unique=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'rdp'
+        verbose_name_plural = 'Rdp'
+        verbose_name = 'Rdp'
+        ordering = ['id']
+
+
+class HotKeyboardKey(BaseModel):
+    name = models.CharField(max_length=100, unique=True, blank=True)
+    code = models.CharField(max_length=100, unique=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'hot_keyboard_key'
+        verbose_name_plural = 'HotKeys'
+        verbose_name = 'HotKey'
+        ordering = ['id']

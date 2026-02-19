@@ -41,6 +41,8 @@ class Computer(BaseModel):
 class Settings(BaseModel):
     name = models.CharField(verbose_name="Nomi", max_length=255, unique=True, blank=True, null=True)
     mode = models.PositiveSmallIntegerField(verbose_name="Mode", default=0)
+
+    # Face
     is_check_face_staff = models.BooleanField(verbose_name="Xodim", default=False)
     is_check_face_candidate = models.BooleanField(verbose_name="Talabgor", default=False)
     is_face_identification = models.BooleanField(verbose_name="Testda yuz tekshiruvi", default=False) #Test jarayonida identifikatsiya qilib turish
@@ -50,15 +52,22 @@ class Settings(BaseModel):
     identity_min_score_staff = models.PositiveSmallIntegerField(verbose_name="Score staff", default=70)
     identity_min_score_candidate = models.PositiveSmallIntegerField(verbose_name="Score candidate", default=70)
     identity_min_score_test = models.PositiveSmallIntegerField(verbose_name="Score test", default=70)
+
+    # Device
     is_screen_record = models.BooleanField(verbose_name="Ekran yozish", default=False)
     is_detect_monitor = models.BooleanField(verbose_name="Ekran tekshiruvi", default=False)
     is_detect_camera = models.BooleanField(verbose_name="Kamera tekshiruvi", default=False)
+
+    # Yolo
     is_enable_detect = models.BooleanField(verbose_name="Cheating", default=False)
     detect_model = models.ForeignKey('coco_class.ModelVersion', on_delete=models.SET_NULL, blank=True, null=True)
     detect_classes = models.ManyToManyField('coco_class.CocoObject', related_name='detect_classes')
     detect_confidence = models.FloatField(verbose_name="Confidence", default=0.5)
     detect_frame_skip = models.PositiveSmallIntegerField(verbose_name="Skip frame", default=20)
 
+    # RDP
+    is_enable_rdp_detect = models.BooleanField(verbose_name="Rdp holati", default=False)
+    rdp_objects = models.ManyToManyField('coco_class.RdpObject', related_name='rdp_detect_objects')
 
     def __str__(self):
         return str(self.name)
