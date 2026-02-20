@@ -5,7 +5,13 @@ from apps.settings.models import (Computer, Settings, IPCamera, ExitPassword, )
 
 @admin.register(Computer)
 class ComputerAdmin(admin.ModelAdmin):
-    list_display = ['id', 'zone', 'name', 'ip_address', 'mac_address', 'ip_camera', 'is_active']
+    list_display = ['id', 'get_region_name', 'zone', 'ip_address', 'mac_address', 'is_active']
+    list_filter = ['zone', 'is_active']
+    list_display_links = ['get_region_name']
+
+    @admin.display(description='Region')
+    def get_region_name(self, obj):
+        return obj.zone.region.name if obj.zone.region else "No Region"
 
 
 

@@ -38,6 +38,22 @@ class Computer(BaseModel):
         db_table = 'computer'
 
 
+class AllowPublicIp(BaseModel):
+    zone = models.ForeignKey('regions.Zone', on_delete=models.SET_NULL, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    ip_address = models.GenericIPAddressField(unique=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.zone} - {self.ip_address}"
+
+    class Meta:
+        abstract = False
+        verbose_name = 'Public IP'
+        verbose_name_plural = 'Public IPs'
+        db_table = 'computer'
+
+
 class Settings(BaseModel):
     name = models.CharField(verbose_name="Nomi", max_length=255, unique=True, blank=True, null=True)
     mode = models.PositiveSmallIntegerField(verbose_name="Mode", default=0)

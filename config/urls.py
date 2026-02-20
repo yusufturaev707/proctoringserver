@@ -13,4 +13,5 @@ urlpatterns += [
     path('api/v1/', include('apps.users.urls')),
     path('api/v1/', include('apps.exams.urls')),
     path('api/v1/', include('apps.notification.urls')),
+    path('api/v1/', include('apps.settings.urls')),
 ]

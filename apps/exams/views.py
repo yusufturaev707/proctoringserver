@@ -1,16 +1,13 @@
 import time
 
 import requests
-from django.core.serializers import serialize
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 
-from apps.coco_class.models import HotKeyboardKey
 from apps.exams.models import Test
 from apps.exams.serializers import TestSerializer
-from apps.settings.models import ExitPassword
 from core.api_service import TestAPIClient
 
 
@@ -19,23 +16,11 @@ class LoadTestsAPIView(APIView):
 
     def get(self, request):
         try:
-            quit_password = '123'
-            hot_keys = ['print screen']
-
             queryset = Test.objects.filter(status=1).order_by('-id')
             serializer = TestSerializer(queryset, many=True)
-            quit_password_obs = ExitPassword.objects.filter(is_active=True)
-            if quit_password_obs.exists():
-                quit_password = quit_password_obs.first().password
 
-            hot_keys_obs = HotKeyboardKey.objects.filter(is_active=True).order_by('id')
-            if hot_keys_obs.exists():
-                for hot_key in hot_keys_obs:
-                    hot_keys.append(hot_key.code)
             data = {
                 "status": "success",
-                "quit_password": quit_password,
-                "hot_keys": hot_keys,
                 "data": serializer.data,
                 "message": "Testlar ro'yxati muvaffaqiyatli yuklab olindi!"
             }
