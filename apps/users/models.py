@@ -40,6 +40,9 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     def __str__(self):
         return self.username
 
+    def get_full_name(self):
+        return self.last_name + ' ' + self.first_name
+
     class Meta:
         abstract = False
         ordering = ["-id"]

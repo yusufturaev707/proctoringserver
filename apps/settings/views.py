@@ -5,26 +5,22 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 
 from apps.coco_class.models import HotKeyboardKey
-from apps.settings.models import Computer, ExitPassword
+from apps.settings.models import (AllowPublicIp, ExitPassword, )
+from core.utils import validate_ip
 
 
-class CheckPermissionDeviceAPIView(APIView):
+class CheckAllowPublicIpAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         try:
-            ip_address = request.GET.get('ip_address')
-            mac_address = request.GET.get('mac_address')
+            ip_address = request.GET.get('ip_address', '')
 
-            if not ip_address:
+            if not validate_ip(ip_address):
                 response_data = {"status": False, "message": "Ruxsat yo'q!!!"}
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
-            if not mac_address:
-                response_data = {"status": False, "message": "Ruxsat yo'q!!"}
-                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
-
-            is_active = Computer.objects.filter(ip_address=ip_address, is_active=True).exists()
+            is_active = AllowPublicIp.objects.filter(ip_address=ip_address, is_active=True).exists()
             if not is_active:
                 response_data = {"status": False, "message": "Ruxsat yo'q!"}
                 return Response(response_data, status=status.HTTP_400_BAD_REQUEST)

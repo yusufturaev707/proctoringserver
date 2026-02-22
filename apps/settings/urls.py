@@ -1,6 +1,6 @@
 from django.urls import path
-from apps.settings.views import (CheckPermissionDeviceAPIView, )
+from apps.settings.views import (CheckAllowPublicIpAPIView, )
 
 urlpatterns = [
-    path('check-permission-device/', CheckPermissionDeviceAPIView.as_view(), name='check-permission-device'),
+    path('check-perm-public-ip/', CheckAllowPublicIpAPIView.as_view(), name='check-perm-public-ip'),
 ]

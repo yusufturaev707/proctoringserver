@@ -1,11 +1,23 @@
 from django.contrib import admin
 
-from apps.settings.models import (Computer, Settings, IPCamera, ExitPassword, )
+from apps.settings.models import (Computer, Settings, IPCamera, ExitPassword, AllowPublicIp,)
 
 
 @admin.register(Computer)
 class ComputerAdmin(admin.ModelAdmin):
     list_display = ['id', 'get_region_name', 'zone', 'ip_address', 'mac_address', 'is_active']
+    list_filter = ['zone', 'is_active']
+    list_display_links = ['get_region_name']
+
+    @admin.display(description='Region')
+    def get_region_name(self, obj):
+        return obj.zone.region.name if obj.zone.region else "No Region"
+
+
+
+@admin.register(AllowPublicIp)
+class AllowPublicIpAdmin(admin.ModelAdmin):
+    list_display = ['id', 'get_region_name', 'zone', 'ip_address', 'is_active']
     list_filter = ['zone', 'is_active']
     list_display_links = ['get_region_name']
 

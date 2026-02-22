@@ -59,3 +59,11 @@ def get_percentage(cosine_score, threshold=0.5):
     similarity_score = round(normalized * 100)
     return round(similarity_score)
 
+import ipaddress
+
+def validate_ip(address):
+    try:
+        ipaddress.ip_address(address)
+        return True
+    except ValueError:
+        return False

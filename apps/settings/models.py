@@ -51,7 +51,7 @@ class AllowPublicIp(BaseModel):
         abstract = False
         verbose_name = 'Public IP'
         verbose_name_plural = 'Public IPs'
-        db_table = 'computer'
+        db_table = 'allowed_public_ip'
 
 
 class Settings(BaseModel):
