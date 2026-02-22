@@ -106,7 +106,7 @@ class GetAccessTokenView(TokenRefreshView):
         try:
             refresh = RefreshToken(refresh_token)
             access = refresh.access_token
-            access.set_exp(lifetime=timedelta(minutes=1))
+            access.set_exp(lifetime=timedelta(days=1))
 
             return Response({
                 'success': True,
