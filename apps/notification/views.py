@@ -1,20 +1,23 @@
 from celery.result import AsyncResult
+from rest_framework.authentication import TokenAuthentication
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.notification.serializers import (
     WarningNotificationSerializer,
-    BulkWarningNotificationSerializer,
+    BulkWarningNotificationSerializer, LoginInfoSerializer,
 )
 from apps.notification.tasks import process_bulk_warnings
 
 
 class SendWarningAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
 
     def post(self, request):
         try:
@@ -41,7 +44,8 @@ class BulkWarningThrottle(AnonRateThrottle):
 
 
 class BulkSendWarningAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
     throttle_classes = [BulkWarningThrottle]
 
     def post(self, request):
@@ -73,7 +77,8 @@ class BulkSendWarningAPIView(APIView):
 
 
 class BulkWarningTaskStatusAPIView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, JWTAuthentication]
 
     def get(self, request, task_id):
         result = AsyncResult(task_id)
@@ -88,3 +93,27 @@ class BulkWarningTaskStatusAPIView(APIView):
             response_data['error'] = str(result.result)
 
         return Response(response_data)
+
+
+class LoginInfoAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            serializer = LoginInfoSerializer(data=request.data)
+
+            if serializer.is_valid():
+                serializer.save(user=request.user)
+                return Response(
+                    {'message': 'Data saqlandi'},
+                    status=status.HTTP_201_CREATED
+                )
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(
+                {'error': f'Xatolik yuz berdi: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

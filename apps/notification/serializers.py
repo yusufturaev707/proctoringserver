@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from apps.exams.models import Test
-from apps.notification.models import WarningNotification
+from apps.notification.models import WarningNotification, InstallInfoLog
 
 
 class WarningNotificationSerializer(serializers.ModelSerializer):
@@ -87,3 +87,12 @@ class BulkWarningNotificationSerializer(serializers.Serializer):
         ]
         created = WarningNotification.objects.bulk_create(notifications, batch_size=500)
         return created
+
+
+class LoginInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstallInfoLog
+        fields = [
+            'id', 'user', 'mac', 'public_ip', 'local_ip',
+            'os_name', 'latitude', 'longitude', 'login_time'
+        ]

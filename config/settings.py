@@ -107,9 +107,12 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         'rest_framework.throttling.UserRateThrottle',
+        'core.throttles.IPRateThrottle',
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "200/min",
+        'ip': '1000/hour',
+        'user': '1000/hour',
     },
 }
 

@@ -40,3 +40,23 @@ class WarningNotification(BaseModel):
             models.Index(fields=['exam', 'warning_type', 'ip_address', 'mac_address']),
         ]
         db_table = 'warning_notification'
+
+
+class InstallInfoLog(BaseModel):
+    user = models.ForeignKey('users.User', on_delete=models.SET_NULL, null=True, blank=True)
+    public_ip = models.GenericIPAddressField(blank=True, null=True)
+    local_ip = models.GenericIPAddressField(blank=True, null=True)
+    mac = models.CharField(blank=True, unique=True, max_length=32)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    os_name = models.CharField(blank=True, null=True, max_length=128)
+    login_time = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.user} - {self.public_ip} ({self.mac})'
+
+    class Meta:
+        verbose_name = 'InstallInfoLog'
+        verbose_name_plural = 'InstallInfoLogs'
+        ordering = ('-id',)
+        db_table = 'install_info_log'
