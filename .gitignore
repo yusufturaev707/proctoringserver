@@ -1,5 +1,4 @@
 # Byte-compiled / optimized / DLL files
-config/settings_prod.py
 __pycache__/
 *.py[cod]
 *$py.class
@@ -7,7 +6,7 @@ __pycache__/
 # C extensions
 *.so
 nul
-
+config/settings_prod.py
 # Distribution / packaging
 .Python
 build/
