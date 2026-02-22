@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = True
+DEBUG = os.getenv("DEBUG", default=False)
 
 ALLOWED_HOSTS = ['*']
 
@@ -48,6 +48,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 ASGI_APPLICATION = "config.asgi.application"
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
+DJANGO_ALLOW_ASYNC_UNSAFE = True
 
 TEMPLATES = [
     {
@@ -107,16 +110,19 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         'rest_framework.throttling.UserRateThrottle',
+        'core.throttles.IPRateThrottle',
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "200/min",
+        'ip': '1000/hour',
+        'user': '1000/hour',
     },
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
-    'ROTATE_REFRESH_TOKENS': True,
+    'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',
     'AUTH_HEADER_TYPES': ('Bearer',),
@@ -147,17 +153,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tashkent'
-
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-
 
 if os.name == 'nt':  # Windows
     CELERY_WORKER_POOL = 'solo'
