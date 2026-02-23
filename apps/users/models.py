@@ -41,7 +41,10 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         return self.username
 
     def get_full_name(self):
-        return self.last_name + ' ' + self.first_name
+        fio = self.username
+        if self.first_name and self.last_name:
+            fio = self.first_name + ' ' + self.last_name
+        return fio
 
     class Meta:
         abstract = False
