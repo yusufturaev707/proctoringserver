@@ -3,6 +3,7 @@ from django.urls import path
 from django.shortcuts import redirect
 from django.contrib import messages
 import requests
+from unfold.admin import ModelAdmin
 
 from apps.exams.models import Test
 from apps.settings.models import Settings
@@ -10,8 +11,17 @@ from core.api_service import TestAPIClient
 
 
 @admin.register(Test)
-class TestAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'setting_mode', 'status']
+class TestAdmin(ModelAdmin):
+    list_display = ['id', 'name', 'key', 'setting_mode', 'site_url', 'status']
+    list_display_links = ['id', 'name']
+    list_filter = ['status', 'setting_mode']
+    search_fields = ['name', 'key']
+    list_select_related = ['setting_mode']
+    list_per_page = 25
+    ordering = ('-id',)
+    compressed_fields = True
+    warn_unsaved_form = True
+
     change_list_template = "exams/test_change_list.html"
 
     def get_urls(self):
