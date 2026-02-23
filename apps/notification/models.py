@@ -24,8 +24,9 @@ class WarningNotification(BaseModel):
         default=WarningType.OTHER
     )
     description = models.TextField(blank=True, null=True)
-    confidence = models.FloatField(default=0.0, blank=True, null=True) # Masalan: 0.98 (98% ishonch bilan bu telefon)
-    is_valid = models.BooleanField(default=True, help_text="Ogohlantirish haqiqiy qoidabuzarlikmi?") # Admin tomonidan tasdiqlash (False positive'larni ajratish uchun)
+    confidence = models.FloatField(default=0.0, blank=True, null=True)  # Masalan: 0.98 (98% ishonch bilan bu telefon)
+    is_valid = models.BooleanField(default=True,
+                                   help_text="Ogohlantirish haqiqiy qoidabuzarlikmi?")  # Admin tomonidan tasdiqlash (False positive'larni ajratish uchun)
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     mac_address = models.CharField(blank=True, null=True, max_length=32)
 
