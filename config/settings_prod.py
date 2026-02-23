@@ -7,9 +7,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv("DEBUG", default=False)
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
 
-ALLOWED_HOSTS = ['192.168.200.100', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['w1.uzbmb.uz', 'localhost', '127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = ["https://w1.uzbmb.uz", "https://www.w1.uzbmb.uz"]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 INSTALLED_APPS = [
     # 'jazzmin',
