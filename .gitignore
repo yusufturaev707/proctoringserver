@@ -178,3 +178,4 @@ cython_debug/
 # Migration files (except __init__.py)
 **/migrations/[0-9]*.py
 **/migrations/0*.py
+static/

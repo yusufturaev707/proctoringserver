@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "t", '11')
 
 ALLOWED_HOSTS = ['w1.uzbmb.uz', 'localhost', '127.0.0.1']
 # ALLOWED_HOSTS = ['*']
