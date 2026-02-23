@@ -2,18 +2,11 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from unfold.admin import ModelAdmin
-from unfold.widgets import UnfoldAdminPasswordInputWidget, UnfoldAdminTextInputWidget
 
 from apps.users.models import Role, User
 
 
 class CustomUserCreationForm(UserCreationForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].widget = UnfoldAdminTextInputWidget()
-        self.fields['password1'].widget = UnfoldAdminPasswordInputWidget()
-        self.fields['password2'].widget = UnfoldAdminPasswordInputWidget()
-
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ('username',)
