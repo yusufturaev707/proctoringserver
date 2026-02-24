@@ -17,7 +17,6 @@ ALLOWED_HOSTS = ['w1.uzbmb.uz', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ["https://w1.uzbmb.uz", "https://www.w1.uzbmb.uz"]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-
 INSTALLED_APPS = [
     # Unfold — django.contrib.admin DAN OLDIN bo'lishi shart
     "unfold",
@@ -58,7 +57,7 @@ UNFOLD = {
     "SHOW_BACK_BUTTON": True,
     "COLORS": {
         "primary": {
-            "50":  "238 242 255",
+            "50": "238 242 255",
             "100": "224 231 255",
             "200": "199 210 254",
             "300": "165 180 252",
@@ -93,7 +92,7 @@ UNFOLD = {
                 ],
             },
             {
-                "title": _("Mintaqalar"),
+                "title": _("Viloyatlar"),
                 "separator": True,
                 "collapsible": True,
                 "items": [
@@ -132,6 +131,16 @@ UNFOLD = {
                         "link": reverse_lazy("admin:settings_settings_changelist"),
                     },
                     {
+                        "title": _("Public IP"),
+                        "icon": "public",
+                        "link": reverse_lazy("admin:settings_allowpublicip_changelist"),
+                    },
+                    {
+                        "title": _("Chiqish paroli"),
+                        "icon": "lock",
+                        "link": reverse_lazy("admin:settings_exitpassword_changelist"),
+                    },
+                    {
                         "title": _("Kompyuterlar"),
                         "icon": "computer",
                         "link": reverse_lazy("admin:settings_computer_changelist"),
@@ -141,20 +150,10 @@ UNFOLD = {
                         "icon": "videocam",
                         "link": reverse_lazy("admin:settings_ipcamera_changelist"),
                     },
-                    {
-                        "title": _("Ruxsat etilgan IP"),
-                        "icon": "public",
-                        "link": reverse_lazy("admin:settings_allowpublicip_changelist"),
-                    },
-                    {
-                        "title": _("Chiqish paroli"),
-                        "icon": "lock",
-                        "link": reverse_lazy("admin:settings_exitpassword_changelist"),
-                    },
                 ],
             },
             {
-                "title": _("Bildirishnomalar"),
+                "title": _("Xabarlar"),
                 "separator": True,
                 "collapsible": True,
                 "items": [
@@ -171,7 +170,7 @@ UNFOLD = {
                 ],
             },
             {
-                "title": _("AI Model Sinflari"),
+                "title": _("AI Model Sinflar"),
                 "separator": True,
                 "collapsible": True,
                 "items": [
@@ -190,13 +189,20 @@ UNFOLD = {
                         "icon": "visibility",
                         "link": reverse_lazy("admin:coco_class_cocoobject_changelist"),
                     },
+                ],
+            },
+            {
+                "title": _("RDP va Keyboard"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
                     {
                         "title": _("RDP ob'ektlari"),
                         "icon": "desktop_windows",
                         "link": reverse_lazy("admin:coco_class_rdpobject_changelist"),
                     },
                     {
-                        "title": _("Issiq tugmalar"),
+                        "title": _("Hot Keys"),
                         "icon": "keyboard",
                         "link": reverse_lazy("admin:coco_class_hotkeyboardkey_changelist"),
                     },

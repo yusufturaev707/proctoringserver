@@ -39,8 +39,8 @@ class WarningNotifAdmin(ModelAdmin):
 @admin.register(models.InstallInfoLog)
 class InstallInfoLogAdmin(ModelAdmin):
     list_display = ['id', 'user', 'mac', 'public_ip', 'local_ip', 'os_name', 'login_time', 'created_at']
-    list_display_links = ['id', 'user']
-    list_filter = ['os_name']
+    list_display_links = ['id', 'user', 'mac']
+    list_filter = ['os_name', 'user', 'public_ip', 'login_time']
     search_fields = ['user__username', 'mac', 'public_ip', 'local_ip', 'os_name']
     list_select_related = ['user']
     list_per_page = 50
