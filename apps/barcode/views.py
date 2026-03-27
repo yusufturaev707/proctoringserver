@@ -46,27 +46,27 @@ def barcode_scan(request):
                 smena = form.cleaned_data['smena']
 
                 # BarcodeCode da bor-yo'qligini tekshirish
-                barcode_code = BarcodeCode.objects.filter(
-                    code=code,
-                    exam=exam,
-                    exam_date=exam_date,
-                    smena=smena,
-                    region=user_region,
-                ).first()
-
-                if not barcode_code:
-                    return JsonResponse({
-                        'detail': f'Kod "{code}" tanlangan parametrlarga mos kelmadi.'
-                    }, status=400)
-
-                if barcode_code.is_sent:
-                    return JsonResponse({
-                        'detail': f'Kod "{code}" allaqachon yuborilgan.'
-                    }, status=400)
+                # barcode_code = BarcodeCode.objects.filter(
+                #     code=code,
+                #     exam=exam,
+                #     exam_date=exam_date,
+                #     smena=smena,
+                #     region=user_region,
+                # ).first()
+                #
+                # if not barcode_code:
+                #     return JsonResponse({
+                #         'detail': f'Kod "{code}" tanlangan parametrlarga mos kelmadi.'
+                #     }, status=400)
+                #
+                # if barcode_code.is_sent:
+                #     return JsonResponse({
+                #         'detail': f'Kod "{code}" allaqachon yuborilgan.'
+                #     }, status=400)
 
                 # BarcodeCode ni is_sent=True qilish
-                barcode_code.is_sent = True
-                barcode_code.save(update_fields=['is_sent', 'updated_at'])
+                # barcode_code.is_sent = True
+                # barcode_code.save(update_fields=['is_sent', 'updated_at'])
 
                 # BarcodeUpload ga saqlash (is_valid=True)
                 obj, created = BarcodeUpload.objects.update_or_create(

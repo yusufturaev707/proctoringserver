@@ -283,8 +283,8 @@
         }
 
         .scan-frame {
-            width: 70%;
-            aspect-ratio: 3/1;
+            width: 85%;
+            aspect-ratio: 2.2/1;
             border: 2px solid rgba(255,255,255,0.6);
             border-radius: 8px;
             position: relative;
@@ -309,11 +309,11 @@
 
         .scan-hint {
             color: rgba(255,255,255,0.8);
-            font-size: 13px;
-            margin-top: 16px;
+            font-size: 12px;
+            margin-top: 6px;
             background: rgba(0,0,0,0.5);
-            padding: 6px 16px;
-            border-radius: 20px;
+            padding: 4px 12px;
+            border-radius: 12px;
         }
 
         .camera-controls {
@@ -321,7 +321,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 20px;
+            padding: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -633,7 +633,7 @@
             .btn-capture .material-icons { font-size: 28px; }
             .btn-switch-cam { width: 40px; height: 40px; }
 
-            .scan-frame { width: 80%; }
+            .scan-frame { width: 90%; }
         }
 
         @media (max-width: 360px) {
@@ -850,12 +850,22 @@
         startCamera();
     });
 
-    // Capture
+    // Capture — faqat scan-frame ichidagi qismni kesib olish
     document.getElementById('btnCapture').addEventListener('click', () => {
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+
+        // scan-frame: 85% width, aspect-ratio 2.2:1, markazda
+        const frameW = vw * 0.85;
+        const frameH = frameW / 2.2;
+        const frameX = (vw - frameW) / 2;
+        const frameY = (vh - frameH) / 2;
+
+        // Crop canvas — faqat barcode qismi
+        canvas.width = frameW;
+        canvas.height = frameH;
         const ctx = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(video, frameX, frameY, frameW, frameH, 0, 0, frameW, frameH);
 
         canvas.toBlob((blob) => {
             capturedBlob = blob;

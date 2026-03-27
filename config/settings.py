@@ -124,6 +124,23 @@ UNFOLD = {
                 ],
             },
             {
+                "title": _("Barcode"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Barcode kodlar"),
+                        "icon": "qr_code",
+                        "link": reverse_lazy("admin:barcode_barcodecode_changelist"),
+                    },
+                    {
+                        "title": _("Barcode yuklamalar"),
+                        "icon": "cloud_upload",
+                        "link": reverse_lazy("admin:users_barcodeupload_changelist"),
+                    },
+                ],
+            },
+            {
                 "title": _("Sozlamalar"),
                 "separator": True,
                 "collapsible": True,
