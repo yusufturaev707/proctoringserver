@@ -108,27 +108,64 @@
             padding: 0 16px;
         }
 
-        /* ===== SNACKBAR / ALERTS ===== */
+        /* ===== SNACKBAR (BOTTOM FIXED) ===== */
+        .snackbar-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+            pointer-events: none;
+        }
+
         .snackbar {
             padding: 14px 20px;
             border-radius: var(--radius);
             font-size: 14px;
-            margin-bottom: 16px;
             display: none;
             align-items: center;
             gap: 12px;
-            animation: slideDown 0.3s ease;
+            pointer-events: auto;
+            max-width: 560px;
+            width: 100%;
+            box-shadow: var(--shadow-3);
+            animation: slideUp 0.3s ease;
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .snackbar.show { display: flex; }
-        .snackbar-success { background: var(--success-bg); color: var(--success); }
-        .snackbar-error { background: var(--error-bg); color: var(--error); }
+
+        .snackbar-success {
+            background: var(--success);
+            color: #fff;
+        }
+
+        .snackbar-error {
+            background: var(--error);
+            color: #fff;
+        }
+
         .snackbar .material-icons { font-size: 22px; flex-shrink: 0; }
+
+        .snackbar .snackbar-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .snackbar .snackbar-close:hover { color: #fff; }
 
         /* ===== CARD ===== */
         .card {
@@ -524,19 +561,26 @@
     </div>
 </header>
 
-<!-- MAIN -->
-<div class="container">
-
-    <!-- SNACKBARS -->
+<!-- BOTTOM SNACKBARS -->
+<div class="snackbar-wrapper">
     <div class="snackbar snackbar-success" id="snackSuccess">
         <span class="material-icons">check_circle</span>
         <span id="successText"></span>
+        <button class="snackbar-close" onclick="this.parentElement.classList.remove('show')">
+            <span class="material-icons" style="font-size:18px;">close</span>
+        </button>
     </div>
     <div class="snackbar snackbar-error" id="snackError">
         <span class="material-icons">error</span>
         <span id="errorText"></span>
+        <button class="snackbar-close" onclick="this.parentElement.classList.remove('show')">
+            <span class="material-icons" style="font-size:18px;">close</span>
+        </button>
     </div>
+</div>
 
+<!-- MAIN -->
+<div class="container">
     <div class="card">
         <div class="card-header">
             <h2>
