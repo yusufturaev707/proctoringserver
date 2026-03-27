@@ -20,7 +20,7 @@ def decode_barcode(image_file):
         return None
 
 
-@login_required
+@login_required(login_url='login-page')
 def barcode_scan(request):
     if request.method == 'POST':
         form = BarcodeUploadForm(request.POST, request.FILES)
