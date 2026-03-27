@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tizimga kirish - Face ID</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { height: 100%; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .login-container { width: 100%; max-width: 420px; }
+
+        .login-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+            padding: 48px 36px 36px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header { text-align: center; margin-bottom: 36px; }
+
+        .login-header .icon-circle {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .login-header .icon-circle .material-icons { font-size: 36px; color: #fff; }
+        .login-header h1 { font-size: 22px; font-weight: 500; color: #1a1a2e; margin-bottom: 4px; }
+        .login-header p { font-size: 14px; color: #666; }
+
+        .form-group { position: relative; margin-bottom: 24px; }
+
+        .form-group .icon-left {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: #999; font-size: 20px; transition: color 0.2s; pointer-events: none;
+        }
+
+        .form-group input {
+            width: 100%; padding: 14px 14px 14px 44px;
+            border: 2px solid #e0e0e0; border-radius: 12px;
+            font-size: 15px; font-family: 'Roboto', sans-serif;
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: #fafafa;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea; background: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+        }
+
+        .form-group input:focus ~ .icon-left { color: #667eea; }
+        .form-group input::placeholder { color: #aaa; }
+
+        .password-toggle {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; padding: 4px; color: #999;
+        }
+        .password-toggle:hover { color: #667eea; }
+
+        .btn-login {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 500; font-family: 'Roboto', sans-serif;
+            cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+            letter-spacing: 0.5px; position: relative; overflow: hidden;
+        }
+
+        .btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
+        .btn-login:active { transform: translateY(0); }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .btn-login .spinner {
+            display: none; width: 20px; height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff;
+            border-radius: 50%; animation: spin 0.6s linear infinite; margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-login.loading .btn-text { display: none; }
+        .btn-login.loading .spinner { display: block; }
+
+        .error-message {
+            background: #fef2f2; color: #dc2626; padding: 12px 16px;
+            border-radius: 10px; font-size: 13px; margin-bottom: 20px;
+            display: none; align-items: center; gap: 8px; border: 1px solid #fecaca;
+        }
+
+        .error-message .material-icons { font-size: 18px; }
+        .error-message.show { display: flex; }
+
+        /* MOBILE */
+        @media (max-width: 480px) {
+            .login-card { padding: 36px 20px 28px; border-radius: 12px; }
+            .login-header { margin-bottom: 28px; }
+            .login-header .icon-circle { width: 60px; height: 60px; }
+            .login-header .icon-circle .material-icons { font-size: 30px; }
+            .login-header h1 { font-size: 20px; }
+            .form-group { margin-bottom: 18px; }
+            .form-group input { padding: 12px 12px 12px 40px; font-size: 16px; border-radius: 10px; }
+            .btn-login { padding: 13px; font-size: 15px; border-radius: 10px; }
+        }
+
+        @media (max-width: 360px) {
+            .login-card { padding: 28px 16px 24px; }
+            .login-header p { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="icon-circle">
+                    <span class="material-icons">face</span>
+                </div>
+                <h1>Face ID tizimi</h1>
+                <p>Tizimga kirish uchun ma'lumotlarni kiriting</p>
+            </div>
+
+            {% if error %}
+            <div class="error-message show">
+                <span class="material-icons">error_outline</span>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login-page' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input type="text" name="username" placeholder="Login" required autocomplete="username">
+                    <span class="material-icons icon-left">person</span>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" name="password" id="password" placeholder="Parol" required autocomplete="current-password">
+                    <span class="material-icons icon-left">lock</span>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <span class="material-icons" id="toggleIcon">visibility</span>
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-login">Kirish</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        }
+    </script>
+</body>
+</html>

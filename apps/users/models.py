@@ -55,3 +55,15 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
 
 
+class BarcodeUpload(BaseModel):
+    exam = models.ForeignKey('exams.Test', on_delete=models.CASCADE, blank=True)
+    exam_date = models.DateField()
+    smena = models.IntegerField()
+    region = models.ForeignKey("regions.Region", on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="barcodes/", blank=True, null=True)
+    uploaded_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
+    code = models.CharField(max_length=20)
+    is_valid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.id}"

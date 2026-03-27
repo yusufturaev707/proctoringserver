@@ -90,9 +90,23 @@ class BulkWarningNotificationSerializer(serializers.Serializer):
 
 
 class LoginInfoSerializer(serializers.ModelSerializer):
+    mac = serializers.CharField(max_length=32)  # unique validator o'chirildi — upsert qilamiz
+
     class Meta:
         model = InstallInfoLog
         fields = [
             'id', 'user', 'mac', 'public_ip', 'local_ip',
             'os_name', 'latitude', 'longitude', 'login_time'
         ]
+        read_only_fields = ['id', 'user']
+
+    def create(self, validated_data):
+        """MAC mavjud bo'lsa yangilash, bo'lmasa yaratish (upsert)."""
+        mac = validated_data.get('mac')
+        if mac:
+            obj, _ = InstallInfoLog.objects.update_or_create(
+                mac=mac,
+                defaults=validated_data,
+            )
+            return obj
+        return super().create(validated_data)

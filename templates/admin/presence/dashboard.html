@@ -1,0 +1,901 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Online Monitoring{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════
+   Material Design 3 — Presence Dashboard
+   ═══════════════════════════════════════════════════ */
+
+:root {
+    --md-primary: 79 70 229;
+    --md-on-primary: 255 255 255;
+    --md-primary-container: 232 234 252;
+    --md-on-primary-container: 36 30 92;
+    --md-surface: 252 252 255;
+    --md-surface-dim: 244 244 250;
+    --md-surface-container: 238 238 246;
+    --md-surface-container-high: 230 231 240;
+    --md-page-bg: 240 241 248;
+    --md-on-surface: 28 27 31;
+    --md-on-surface-variant: 73 69 79;
+    --md-outline: 196 199 210;
+    --md-outline-variant: 223 225 235;
+    --md-success: 16 185 129;
+    --md-success-container: 209 250 229;
+    --md-on-success-container: 6 95 70;
+    --md-warning: 245 158 11;
+    --md-warning-container: 254 243 199;
+    --md-on-warning-container: 146 64 14;
+    --md-error: 239 68 68;
+    --md-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 2px 8px rgba(79,70,229,0.04);
+    --md-shadow-md: 0 2px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(79,70,229,0.06);
+    --md-radius-sm: 8px;
+    --md-radius-md: 12px;
+    --md-radius-lg: 16px;
+    --md-radius-xl: 28px;
+}
+
+.md-dashboard {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 24px;
+    min-height: 100vh;
+    background: rgb(var(--md-page-bg));
+    border-radius: var(--md-radius-lg);
+}
+
+/* ── Override parent container bg ── */
+#content, #content-main, .container-fluid {
+    background: rgb(var(--md-page-bg)) !important;
+}
+
+/* ── Top Bar ── */
+.md-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding: 20px 28px;
+    background: linear-gradient(135deg, rgb(var(--md-primary)), rgb(99 102 241));
+    border-radius: var(--md-radius-lg);
+    box-shadow: 0 4px 24px rgba(79,70,229,0.18);
+}
+
+.md-topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+}
+
+.md-topbar-title .material-symbols-rounded {
+    font-size: 28px;
+    color: rgba(255,255,255,0.9);
+}
+
+.md-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.md-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: var(--md-radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.md-chip.connected {
+    background: rgba(255,255,255,0.2);
+    color: #d1fae5;
+    backdrop-filter: blur(4px);
+}
+
+.md-chip.disconnected {
+    background: rgba(255,255,255,0.2);
+    color: #fecaca;
+    backdrop-filter: blur(4px);
+}
+
+.md-chip.connecting {
+    background: rgba(255,255,255,0.2);
+    color: #fef3c7;
+    backdrop-filter: blur(4px);
+}
+
+.md-time {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.75);
+}
+
+/* ── Stats Cards ── */
+.md-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.md-stat-card {
+    background: rgb(var(--md-surface));
+    border: 1px solid rgb(var(--md-outline-variant) / 0.6);
+    border-radius: var(--md-radius-lg);
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: var(--md-shadow);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.md-stat-card:hover {
+    box-shadow: var(--md-shadow-md);
+    transform: translateY(-2px);
+}
+
+.md-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--md-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.md-stat-icon .material-symbols-rounded { font-size: 24px; }
+.md-stat-icon.green { background: rgb(var(--md-success-container)); color: rgb(var(--md-on-success-container)); }
+.md-stat-icon.indigo { background: rgb(var(--md-primary-container)); color: rgb(var(--md-on-primary-container)); }
+.md-stat-icon.amber { background: rgb(var(--md-warning-container)); color: rgb(var(--md-on-warning-container)); }
+
+.md-stat-content { flex: 1; min-width: 0; }
+
+.md-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: rgb(var(--md-on-surface));
+}
+
+.md-stat-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: rgb(var(--md-on-surface-variant));
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+}
+
+/* ── Table Card ── */
+.md-card {
+    background: rgb(var(--md-surface));
+    border: 1px solid rgb(var(--md-outline-variant) / 0.6);
+    border-radius: var(--md-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--md-shadow);
+}
+
+.md-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgb(var(--md-outline-variant));
+    background: rgb(var(--md-surface));
+}
+
+.md-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgb(var(--md-on-surface));
+    margin: 0;
+}
+
+.md-card-title .material-symbols-rounded {
+    font-size: 20px;
+    color: rgb(var(--md-primary));
+}
+
+/* ── Search & Filter Bar ── */
+.md-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid rgb(var(--md-outline-variant));
+    background: rgb(var(--md-surface-dim));
+    flex-wrap: wrap;
+}
+
+.md-search {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.md-search .material-symbols-rounded {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: rgb(var(--md-on-surface-variant));
+    pointer-events: none;
+}
+
+.md-search input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid rgb(var(--md-outline));
+    border-radius: var(--md-radius-xl);
+    background: rgb(var(--md-surface));
+    color: rgb(var(--md-on-surface));
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-search input::placeholder {
+    color: rgb(var(--md-on-surface-variant));
+}
+
+.md-search input:focus {
+    border-color: rgb(var(--md-primary));
+    box-shadow: 0 0 0 2px rgb(var(--md-primary) / 0.15);
+}
+
+.md-filter-select {
+    padding: 10px 36px 10px 14px;
+    border: 1px solid rgb(var(--md-outline));
+    border-radius: var(--md-radius-xl);
+    background: rgb(var(--md-surface));
+    color: rgb(var(--md-on-surface));
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 01.708 0L8 8.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-filter-select:focus {
+    border-color: rgb(var(--md-primary));
+    box-shadow: 0 0 0 2px rgb(var(--md-primary) / 0.15);
+}
+
+.md-filter-count {
+    font-size: 0.8rem;
+    color: rgb(var(--md-on-surface-variant));
+    white-space: nowrap;
+}
+
+.md-filter-count strong {
+    color: rgb(var(--md-on-surface));
+}
+
+/* ── Pulse ── */
+.md-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgb(var(--md-success));
+    display: inline-block;
+    position: relative;
+}
+
+.md-pulse::after {
+    content: '';
+    position: absolute;
+    top: -3px; left: -3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: rgb(var(--md-success) / 0.3);
+    animation: md-ripple 2s ease-out infinite;
+}
+
+@keyframes md-ripple {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+.md-pulse.off { background: rgb(var(--md-error)); }
+.md-pulse.off::after { animation: none; display: none; }
+
+/* ── Table ── */
+.md-table { width: 100%; border-collapse: collapse; }
+
+.md-table thead th {
+    text-align: left;
+    padding: 12px 24px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgb(var(--md-on-surface-variant));
+    background: rgb(var(--md-surface-dim));
+    border-bottom: 1px solid rgb(var(--md-outline-variant));
+}
+
+.md-table tbody td {
+    padding: 14px 24px;
+    font-size: 0.875rem;
+    color: rgb(var(--md-on-surface));
+    border-bottom: 1px solid rgb(var(--md-outline-variant) / 0.5);
+    vertical-align: middle;
+}
+
+.md-table tbody tr { transition: background 0.15s ease; }
+.md-table tbody tr:hover { background: rgb(var(--md-surface-dim)); }
+.md-table tbody tr:last-child td { border-bottom: none; }
+.md-table tbody tr.hidden { display: none; }
+
+/* ── User cell ── */
+.md-user-cell { display: flex; align-items: center; gap: 12px; }
+
+.md-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgb(var(--md-primary-container));
+    color: rgb(var(--md-on-primary-container));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 600; flex-shrink: 0;
+}
+
+.md-user-info { min-width: 0; }
+
+.md-user-name {
+    font-weight: 600; font-size: 0.875rem;
+    color: rgb(var(--md-on-surface));
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.md-user-sub {
+    font-size: 0.75rem;
+    color: rgb(var(--md-on-surface-variant));
+    margin-top: 1px;
+}
+
+/* ── Badges ── */
+.md-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 12px; border-radius: var(--md-radius-xl);
+    font-size: 0.75rem; font-weight: 600;
+}
+
+.md-badge.success { background: rgb(var(--md-success-container)); color: rgb(var(--md-on-success-container)); }
+
+.md-region-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--md-radius-sm);
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: rgb(var(--md-surface-container));
+    color: rgb(var(--md-on-surface-variant));
+    border: 1px solid rgb(var(--md-outline-variant));
+}
+
+/* ── MAC tags ── */
+.md-mac-list { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.md-mac-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgb(var(--md-surface-container));
+    border: 1px solid rgb(var(--md-outline-variant));
+    color: rgb(var(--md-on-surface));
+    font-size: 0.75rem; font-weight: 500;
+    padding: 4px 10px; border-radius: var(--md-radius-sm);
+    font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+    transition: all 0.15s ease;
+}
+
+.md-mac-tag:hover {
+    background: rgb(var(--md-primary-container));
+    border-color: rgb(var(--md-primary) / 0.2);
+}
+
+.md-mac-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: rgb(var(--md-success)); flex-shrink: 0;
+}
+
+/* ── Empty ── */
+.md-empty { text-align: center; padding: 60px 24px; }
+.md-empty .material-symbols-rounded { font-size: 56px; color: rgb(var(--md-outline)); margin-bottom: 16px; }
+.md-empty-title { font-size: 1rem; font-weight: 600; color: rgb(var(--md-on-surface)); margin-bottom: 4px; }
+.md-empty-sub { font-size: 0.85rem; color: rgb(var(--md-on-surface-variant)); }
+
+/* ── Row number ── */
+.md-row-num {
+    width: 32px; height: 32px; border-radius: var(--md-radius-sm);
+    background: rgb(var(--md-surface-container));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 600; color: rgb(var(--md-on-surface-variant));
+}
+
+/* ═══ Dark Mode ═══ */
+[data-theme="dark"] .md-dashboard,
+.dark .md-dashboard {
+    --md-primary: 129 140 248;
+    --md-on-primary: 30 27 75;
+    --md-primary-container: 49 46 129;
+    --md-on-primary-container: 199 210 254;
+    --md-surface: 24 24 32;
+    --md-surface-dim: 18 18 24;
+    --md-surface-container: 33 33 42;
+    --md-surface-container-high: 46 46 56;
+    --md-page-bg: 14 14 20;
+    --md-on-surface: 230 225 241;
+    --md-on-surface-variant: 147 143 160;
+    --md-outline: 72 70 83;
+    --md-outline-variant: 46 46 56;
+    --md-success-container: 6 78 59;
+    --md-on-success-container: 110 231 183;
+    --md-warning-container: 120 53 15;
+    --md-on-warning-container: 253 230 138;
+    --md-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    --md-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+[data-theme="dark"] .md-topbar,
+.dark .md-topbar {
+    background: linear-gradient(135deg, rgb(67 56 202), rgb(99 102 241));
+    box-shadow: 0 4px 24px rgba(99,102,241,0.25);
+}
+
+[data-theme="dark"] #content,
+[data-theme="dark"] #content-main,
+[data-theme="dark"] .container-fluid,
+.dark #content,
+.dark #content-main,
+.dark .container-fluid {
+    background: rgb(var(--md-page-bg)) !important;
+}
+
+[data-theme="dark"] .md-search input,
+[data-theme="dark"] .md-filter-select,
+.dark .md-search input,
+.dark .md-filter-select {
+    background: rgb(var(--md-surface-container));
+    border-color: rgb(var(--md-outline));
+    color: rgb(var(--md-on-surface));
+}
+
+[data-theme="dark"] .md-filter-select,
+.dark .md-filter-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 01.708 0L8 8.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] .md-toolbar,
+.dark .md-toolbar {
+    background: rgb(var(--md-surface-dim));
+}
+
+[data-theme="dark"] .md-card-header,
+.dark .md-card-header {
+    background: rgb(var(--md-surface));
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 768px) {
+    .md-stats { grid-template-columns: 1fr; }
+    .md-table thead th, .md-table tbody td { padding: 10px 16px; }
+    .md-topbar { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .md-toolbar { padding: 12px 16px; }
+}
+</style>
+
+<div class="md-dashboard">
+
+    <!-- ═══ Top Bar ═══ -->
+    <div class="md-topbar">
+        <div class="md-topbar-title">
+            <span class="material-symbols-rounded">monitor_heart</span>
+            Online Monitoring
+        </div>
+        <div class="md-topbar-right">
+            <span class="md-time" id="last-update">{{ now }}</span>
+            <span class="md-chip connecting" id="ws-status">
+                <span class="md-pulse off"></span>
+                Ulanmoqda...
+            </span>
+        </div>
+    </div>
+
+    <!-- ═══ Stats ═══ -->
+    <div class="md-stats">
+        <div class="md-stat-card">
+            <div class="md-stat-icon green">
+                <span class="material-symbols-rounded">lan</span>
+            </div>
+            <div class="md-stat-content">
+                <div class="md-stat-value" id="stat-connections">{{ total_online_connections }}</div>
+                <div class="md-stat-label">Jami ulanishlar</div>
+            </div>
+        </div>
+        <div class="md-stat-card">
+            <div class="md-stat-icon indigo">
+                <span class="material-symbols-rounded">group</span>
+            </div>
+            <div class="md-stat-content">
+                <div class="md-stat-value" id="stat-users">{{ unique_users_online }}</div>
+                <div class="md-stat-label">Online foydalanuvchilar</div>
+            </div>
+        </div>
+        <div class="md-stat-card">
+            <div class="md-stat-icon amber">
+                <span class="material-symbols-rounded">computer</span>
+            </div>
+            <div class="md-stat-content">
+                <div class="md-stat-value" id="stat-pcs">{{ unique_pcs_online }}</div>
+                <div class="md-stat-label">Online kompyuterlar</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Users Table ═══ -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title">
+                <span class="material-symbols-rounded">devices</span>
+                Desktop clientlar
+            </h3>
+            <span class="md-badge success" id="badge-count">
+                <span class="md-pulse"></span>
+                {{ unique_users_online }} ta online
+            </span>
+        </div>
+
+        <!-- ── Search & Filter ── -->
+        <div class="md-toolbar">
+            <div class="md-search">
+                <span class="material-symbols-rounded">search</span>
+                <input type="text" id="search-input" placeholder="Ism, username, MAC yoki IP bo'yicha qidirish..." autocomplete="off">
+            </div>
+            <select class="md-filter-select" id="filter-region">
+                <option value="">Barcha viloyatlar</option>
+                {% for r in regions %}
+                    <option value="{{ r.id }}">{{ r.name }}</option>
+                {% endfor %}
+            </select>
+            <select class="md-filter-select" id="filter-zone">
+                <option value="">Barcha binolar</option>
+                {% for z in zones %}
+                    <option value="{{ z.id }}" data-region="{{ z.region_id }}">{{ z.name }}</option>
+                {% endfor %}
+            </select>
+            <select class="md-filter-select" id="filter-role">
+                <option value="">Barcha rollar</option>
+                {% for r in roles %}
+                    <option value="{{ r.id }}">{{ r.name }}</option>
+                {% endfor %}
+            </select>
+            <span class="md-filter-count" id="filter-count">
+                <strong>{{ unique_users_online }}</strong> / {{ unique_users_online }} ko'rsatilmoqda
+            </span>
+        </div>
+
+        <table class="md-table">
+            <thead>
+                <tr>
+                    <th style="width:60px">#</th>
+                    <th>Foydalanuvchi</th>
+                    <th>Viloyat</th>
+                    <th>Bino</th>
+                    <th>Rol</th>
+                    <th style="width:120px">Online PClar</th>
+                    <th>MAC / IP</th>
+                </tr>
+            </thead>
+            <tbody id="users-tbody">
+                {% if users %}
+                    {% for u in users %}
+                    <tr data-username="{{ u.user__username }}"
+                        data-fullname="{{ u.user__first_name|default:'' }} {{ u.user__last_name|default:'' }}"
+                        data-region-id="{{ u.user__region__id|default:'' }}"
+                        data-zone-ids="{{ u.zone_ids|join:',' }}"
+                        data-role-id="{{ u.user__role__id|default:'' }}"
+                        data-macs="{% for mac in u.mac_list %}{{ mac }} {% endfor %}"
+                        data-ips="{% for ip in u.ip_list %}{{ ip.public_ip }} {{ ip.local_ip }} {% endfor %}">
+                        <td><span class="md-row-num">{{ forloop.counter }}</span></td>
+                        <td>
+                            <div class="md-user-cell">
+                                <div class="md-avatar">{{ u.user__first_name|default:"?" |truncatechars:1 }}{{ u.user__last_name|default:"" |truncatechars:1 }}</div>
+                                <div class="md-user-info">
+                                    <div class="md-user-name">{{ u.user__first_name|default:"" }} {{ u.user__last_name|default:"" }}</div>
+                                    <div class="md-user-sub">{{ u.user__username }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="md-region-badge">{{ u.user__region__name|default:"—" }}</span></td>
+                        <td><span class="md-region-badge">{{ u.zone_names|join:", "|default:"—" }}</span></td>
+                        <td><span class="md-region-badge">{{ u.user__role__name|default:"—" }}</span></td>
+                        <td><span class="md-badge success">{{ u.online_pcs }} PC</span></td>
+                        <td>
+                            <div class="md-mac-list">
+                                {% for ip in u.ip_list %}
+                                    <span class="md-mac-tag">
+                                        <span class="md-mac-dot"></span>
+                                        {{ ip.mac }}
+                                        {% if ip.public_ip %}<br><small style="color:rgb(var(--md-on-surface-variant))">{{ ip.public_ip }}{% if ip.local_ip %} / {{ ip.local_ip }}{% endif %}</small>{% endif %}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr id="empty-row">
+                        <td colspan="7">
+                            <div class="md-empty">
+                                <span class="material-symbols-rounded">desktop_access_disabled</span>
+                                <div class="md-empty-title">Hozircha hech kim online emas</div>
+                                <div class="md-empty-sub">Desktop clientdan login qilinganida bu yerda ko'rinadi</div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ WebSocket + Search/Filter ═══ -->
+<script>
+(function() {
+    const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsUrl = wsScheme + '://' + window.location.host + '/ws/presence/?token={{ admin_token }}&mac_address=admin-dashboard';
+
+    const statusEl   = document.getElementById('ws-status');
+    const badgeEl    = document.getElementById('badge-count');
+    const searchEl   = document.getElementById('search-input');
+    const regionEl   = document.getElementById('filter-region');
+    const zoneEl     = document.getElementById('filter-zone');
+    const roleEl     = document.getElementById('filter-role');
+    const countEl    = document.getElementById('filter-count');
+    const tbody      = document.getElementById('users-tbody');
+
+    // Zone filterini region bo'yicha cheklash
+    const allZoneOptions = Array.from(zoneEl.querySelectorAll('option[value]'));
+    regionEl.addEventListener('change', function() {
+        const rid = regionEl.value;
+        zoneEl.value = '';
+        allZoneOptions.forEach(function(opt) {
+            if (!opt.value) return;
+            opt.style.display = (!rid || opt.dataset.region === rid) ? '' : 'none';
+        });
+    });
+
+    let ws = null;
+    let reconnectTimer = null;
+    let reconnectDelay = 1000;
+
+    // ── Barcha userlar (WebSocket dan kelgan) ──
+    let allUsers = [];
+    let totalStats = { total_online_connections: 0, unique_users_online: 0, unique_pcs_online: 0 };
+
+    // ══════════════════════════════════════
+    // WS Status
+    // ══════════════════════════════════════
+    function setStatus(s) {
+        statusEl.className = 'md-chip ' + s;
+        if (s === 'connected')    statusEl.innerHTML = '<span class="md-pulse"></span> Real-time';
+        else if (s === 'disconnected') statusEl.innerHTML = '<span class="md-pulse off"></span> Uzilgan';
+        else                      statusEl.innerHTML = '<span class="md-pulse off"></span> Ulanmoqda...';
+        if (s === 'connected') reconnectDelay = 1000;
+    }
+
+    // ══════════════════════════════════════
+    // Helpers
+    // ══════════════════════════════════════
+    function time() {
+        return new Date().toLocaleTimeString('uz-UZ', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+
+    function initials(first, last) {
+        return ((first||'?')[0] + (last||'')[0]).toUpperCase();
+    }
+
+    function esc(s) {
+        const d = document.createElement('div');
+        d.textContent = s || '';
+        return d.innerHTML;
+    }
+
+    // ══════════════════════════════════════
+    // Filter & Render
+    // ══════════════════════════════════════
+    function getFilteredUsers() {
+        const q = searchEl.value.trim().toLowerCase();
+        const regionId = regionEl.value;
+        const zoneId = zoneEl.value;
+        const roleId = roleEl.value;
+
+        return allUsers.filter(function(u) {
+            // Region filter
+            if (regionId && String(u.user__region__id || '') !== regionId) return false;
+
+            // Zone filter
+            if (zoneId && !(u.zone_ids || []).some(function(id) { return String(id) === zoneId; })) return false;
+
+            // Role filter
+            if (roleId && String(u.user__role__id || '') !== roleId) return false;
+
+            // Search filter (username, first_name, last_name, mac, public_ip, local_ip)
+            if (q) {
+                const ipParts = (u.ip_list || []).map(function(ip) {
+                    return (ip.public_ip || '') + ' ' + (ip.local_ip || '');
+                }).join(' ');
+                const haystack = [
+                    u.user__first_name || '',
+                    u.user__last_name || '',
+                    u.user__username || '',
+                    (u.mac_list || []).join(' '),
+                    ipParts,
+                ].join(' ').toLowerCase();
+                if (haystack.indexOf(q) === -1) return false;
+            }
+
+            return true;
+        });
+    }
+
+    function renderTable() {
+        const filtered = getFilteredUsers();
+
+        // Stats — filtered bo'lsa filtrlanganini ko'rsat
+        if (searchEl.value || regionEl.value || zoneEl.value || roleEl.value) {
+            let fPcs = 0;
+            filtered.forEach(function(u) { fPcs += u.online_pcs; });
+            document.getElementById('stat-connections').textContent = fPcs;
+            document.getElementById('stat-users').textContent = filtered.length;
+            document.getElementById('stat-pcs').textContent = fPcs;
+        } else {
+            document.getElementById('stat-connections').textContent = totalStats.total_online_connections;
+            document.getElementById('stat-users').textContent = totalStats.unique_users_online;
+            document.getElementById('stat-pcs').textContent = totalStats.unique_pcs_online;
+        }
+
+        // Badge & count
+        badgeEl.innerHTML = '<span class="md-pulse"></span> ' + totalStats.unique_users_online + ' ta online';
+        countEl.innerHTML = '<strong>' + filtered.length + '</strong> / ' + allUsers.length + ' ko\'rsatilmoqda';
+
+        if (!filtered.length && !allUsers.length) {
+            tbody.innerHTML =
+                '<tr><td colspan="7"><div class="md-empty">' +
+                '<span class="material-symbols-rounded">desktop_access_disabled</span>' +
+                '<div class="md-empty-title">Hozircha hech kim online emas</div>' +
+                '<div class="md-empty-sub">Desktop clientdan login qilinganida bu yerda ko\'rinadi</div>' +
+                '</div></td></tr>';
+            return;
+        }
+
+        if (!filtered.length) {
+            tbody.innerHTML =
+                '<tr><td colspan="7"><div class="md-empty">' +
+                '<span class="material-symbols-rounded">filter_list_off</span>' +
+                '<div class="md-empty-title">Filtr bo\'yicha natija topilmadi</div>' +
+                '<div class="md-empty-sub">Qidiruv yoki viloyat filtrini o\'zgartiring</div>' +
+                '</div></td></tr>';
+            return;
+        }
+
+        let h = '';
+        filtered.forEach(function(u, i) {
+            const fn = u.user__first_name || '';
+            const ln = u.user__last_name || '';
+            const un = u.user__username || '';
+            const rn = u.user__region__name || '\u2014';
+            const rid = u.user__region__id || '';
+            const roleName = u.user__role__name || '\u2014';
+            const zoneNames = (u.zone_names || []).join(', ') || '\u2014';
+
+            h += '<tr data-username="' + esc(un) + '" data-fullname="' + esc(fn + ' ' + ln) + '" data-region-id="' + rid + '">';
+            h += '<td><span class="md-row-num">' + (i+1) + '</span></td>';
+            h += '<td><div class="md-user-cell">';
+            h += '<div class="md-avatar">' + initials(fn, ln) + '</div>';
+            h += '<div class="md-user-info">';
+            h += '<div class="md-user-name">' + esc(fn + ' ' + ln) + '</div>';
+            h += '<div class="md-user-sub">' + esc(un) + '</div>';
+            h += '</div></div></td>';
+            h += '<td><span class="md-region-badge">' + esc(rn) + '</span></td>';
+            h += '<td><span class="md-region-badge">' + esc(zoneNames) + '</span></td>';
+            h += '<td><span class="md-region-badge">' + esc(roleName) + '</span></td>';
+            h += '<td><span class="md-badge success">' + u.online_pcs + ' PC</span></td>';
+            h += '<td><div class="md-mac-list">';
+            (u.ip_list || []).forEach(function(ip) {
+                h += '<span class="md-mac-tag"><span class="md-mac-dot"></span>' + esc(ip.mac);
+                if (ip.public_ip) {
+                    h += '<br><small style="color:rgb(var(--md-on-surface-variant))">' + esc(ip.public_ip);
+                    if (ip.local_ip) h += ' / ' + esc(ip.local_ip);
+                    h += '</small>';
+                }
+                h += '</span>';
+            });
+            h += '</div></td>';
+            h += '</tr>';
+        });
+        tbody.innerHTML = h;
+    }
+
+    // ══════════════════════════════════════
+    // WS Data Update
+    // ══════════════════════════════════════
+    function onData(data) {
+        totalStats = {
+            total_online_connections: data.total_online_connections || 0,
+            unique_users_online: data.unique_users_online || 0,
+            unique_pcs_online: data.unique_pcs_online || 0,
+        };
+        allUsers = data.users || [];
+        document.getElementById('last-update').textContent = time();
+        renderTable();
+    }
+
+    // ══════════════════════════════════════
+    // Search & Filter Events
+    // ══════════════════════════════════════
+    let searchTimeout = null;
+    searchEl.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(renderTable, 150);
+    });
+
+    regionEl.addEventListener('change', renderTable);
+    zoneEl.addEventListener('change', renderTable);
+    roleEl.addEventListener('change', renderTable);
+
+    // ══════════════════════════════════════
+    // WebSocket
+    // ══════════════════════════════════════
+    function connect() {
+        if (ws && ws.readyState <= 1) return;
+        setStatus('connecting');
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function() { setStatus('connected'); };
+
+        ws.onmessage = function(e) {
+            try {
+                const d = JSON.parse(e.data);
+                if (d.type === 'dashboard_update') onData(d);
+            } catch(err) {}
+        };
+
+        ws.onclose = function() {
+            setStatus('disconnected');
+            if (reconnectTimer) clearTimeout(reconnectTimer);
+            reconnectTimer = setTimeout(function() {
+                reconnectDelay = Math.min(reconnectDelay * 1.5, 30000);
+                connect();
+            }, reconnectDelay);
+        };
+
+        ws.onerror = function() { ws.close(); };
+    }
+
+    connect();
+})();
+</script>
+{% endblock %}

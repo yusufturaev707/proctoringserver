@@ -151,3 +151,35 @@ class LogoutView(APIView):
                 {'error': 'Kutilmagan xatolik yuz berdi'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('barcode-scan')
+
+    error = None
+    if request.method == 'POST':
+        u = request.POST.get('username', '').strip()
+        p = request.POST.get('password', '')
+        user = authenticate(request, username=u, password=p)
+
+        if user:
+            if getattr(user, 'is_blocked', False):
+                error = "Sizning akkauntingiz bloklangan"
+            else:
+                login(request, user)
+                return redirect('barcode-scan')
+        else:
+            error = "Login yoki parol noto'g'ri"
+
+    return render(request, 'users/login.html', {'error': error})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('login-page')

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1565C0;
+            --primary-light: #1E88E5;
+            --primary-dark: #0D47A1;
+            --surface: #FFFFFF;
+            --background: #F5F5F5;
+            --on-primary: #FFFFFF;
+            --on-surface: #212121;
+            --on-surface-muted: #757575;
+            --outline: #E0E0E0;
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --error: #C62828;
+            --error-bg: #FFEBEE;
+            --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
+            --shadow-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { height: 100%; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--background);
+            min-height: 100%;
+            color: var(--on-surface);
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* ===== TOP APP BAR ===== */
+        .app-bar {
+            background: var(--primary);
+            height: 64px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-bar-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--on-primary);
+            font-size: 20px;
+            font-weight: 500;
+            letter-spacing: 0.15px;
+        }
+
+        .app-bar-title .material-icons-outlined { font-size: 28px; }
+
+        .app-bar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: var(--on-primary);
+            font-size: 14px;
+        }
+
+        .user-chip .material-icons { font-size: 20px; }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: var(--on-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover { background: rgba(255,255,255,0.25); }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 600px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+
+        /* ===== SNACKBAR / ALERTS ===== */
+        .snackbar {
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .snackbar.show { display: flex; }
+        .snackbar-success { background: var(--success-bg); color: var(--success); }
+        .snackbar-error { background: var(--error-bg); color: var(--error); }
+        .snackbar .material-icons { font-size: 22px; flex-shrink: 0; }
+
+        /* ===== CARD ===== */
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow-1);
+            overflow: hidden;
+            animation: fadeUp 0.4s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--outline);
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--on-surface);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header h2 .material-icons-outlined {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .card-body { padding: 24px; }
+
+        /* ===== FORM FIELDS ===== */
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .field-label .required { color: var(--error); }
+
+        .field-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid var(--outline);
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: var(--surface);
+            color: var(--on-surface);
+            -webkit-appearance: none;
+        }
+
+        .field-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        select.field-input {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23757575' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ===== CAMERA ===== */
+        .camera-section {
+            margin-bottom: 20px;
+        }
+
+        .camera-viewport {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 4/3;
+        }
+
+        .camera-viewport video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .scan-frame {
+            width: 70%;
+            aspect-ratio: 3/1;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .scan-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-light);
+            animation: scanLine 2s ease-in-out infinite;
+            box-shadow: 0 0 8px var(--primary-light);
+        }
+
+        @keyframes scanLine {
+            0%, 100% { top: 0; }
+            50% { top: calc(100% - 2px); }
+        }
+
+        .scan-hint {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            margin-top: 16px;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6));
+        }
+
+        .btn-capture {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            background: rgba(255,255,255,0.25);
+            cursor: pointer;
+            transition: transform 0.15s, background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
+        .btn-capture:hover {
+            transform: scale(1.08);
+            background: rgba(255,255,255,0.4);
+        }
+
+        .btn-capture:active { transform: scale(0.95); }
+
+        .btn-capture .material-icons {
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .btn-switch-cam {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            transition: background 0.2s;
+        }
+
+        .btn-switch-cam:hover { background: rgba(255,255,255,0.35); }
+
+        /* Camera off state */
+        .camera-off {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #263238;
+            color: rgba(255,255,255,0.6);
+            aspect-ratio: 4/3;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .camera-off:hover { background: #37474F; }
+        .camera-off .material-icons-outlined { font-size: 56px; margin-bottom: 12px; }
+        .camera-off p { font-size: 14px; }
+
+        /* Preview */
+        .preview-section {
+            display: none;
+        }
+
+        .preview-section.show { display: block; }
+
+        .preview-image {
+            width: 100%;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-1);
+        }
+
+        .preview-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-retake {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1.5px solid var(--outline);
+            background: var(--surface);
+            color: var(--on-surface-muted);
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .btn-retake:hover {
+            background: var(--background);
+            border-color: var(--on-surface-muted);
+        }
+
+        .btn-retake .material-icons { font-size: 18px; }
+
+        canvas { display: none; }
+
+        /* ===== SUBMIT BUTTON ===== */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+            box-shadow: var(--shadow-1);
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-light);
+            box-shadow: var(--shadow-2);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active { transform: translateY(0); }
+
+        .btn-submit:disabled {
+            background: #BDBDBD;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-submit .spinner {
+            display: none;
+            width: 22px;
+            height: 22px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-submit.loading .btn-text { display: none; }
+        .btn-submit.loading .spinner { display: block; }
+        .btn-submit.loading .material-icons { display: none; }
+
+        /* ===== RESULT BADGE ===== */
+        .result-badge {
+            display: none;
+            margin-top: 16px;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            background: var(--success-bg);
+            border: 1px solid #A5D6A7;
+        }
+
+        .result-badge.show { display: block; }
+
+        .result-badge .code {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--success);
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 2px;
+        }
+
+        .result-badge .label {
+            font-size: 12px;
+            color: var(--on-surface-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .app-bar { height: 56px; padding: 0 12px; }
+            .app-bar-title { font-size: 18px; gap: 8px; }
+            .app-bar-title .material-icons-outlined { font-size: 24px; }
+
+            .user-chip span:not(.material-icons) { display: none; }
+            .user-chip { padding: 6px 10px; }
+
+            .container { margin: 16px auto; padding: 0 12px; }
+            .card-body { padding: 20px 16px; }
+            .card-header { padding: 16px 16px 12px; }
+
+            .field-row { grid-template-columns: 1fr; gap: 0; }
+            .field-input { font-size: 16px; padding: 12px 14px; }
+
+            .btn-capture { width: 56px; height: 56px; }
+            .btn-capture .material-icons { font-size: 28px; }
+            .btn-switch-cam { width: 40px; height: 40px; }
+
+            .scan-frame { width: 80%; }
+        }
+
+        @media (max-width: 360px) {
+            .card-body { padding: 16px 12px; }
+            .field-input { padding: 11px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP APP BAR -->
+<header class="app-bar">
+    <div class="app-bar-title">
+        <span class="material-icons-outlined">qr_code_scanner</span>
+        Barcode Scanner
+    </div>
+    <div class="app-bar-actions">
+        <div class="user-chip">
+            <span class="material-icons">person</span>
+            <span>{{ user.username }}</span>
+        </div>
+        <a href="{% url 'logout' %}" class="btn-icon" title="Chiqish">
+            <span class="material-icons" style="font-size:22px;">logout</span>
+        </a>
+    </div>
+</header>
+
+<!-- MAIN -->
+<div class="container">
+
+    <!-- SNACKBARS -->
+    <div class="snackbar snackbar-success" id="snackSuccess">
+        <span class="material-icons">check_circle</span>
+        <span id="successText"></span>
+    </div>
+    <div class="snackbar snackbar-error" id="snackError">
+        <span class="material-icons">error</span>
+        <span id="errorText"></span>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <span class="material-icons-outlined">document_scanner</span>
+                Barcode skanerlash
+            </h2>
+        </div>
+
+        <div class="card-body">
+            <form id="scanForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- EXAM -->
+                <div class="field">
+                    <label class="field-label">Testni tanlang <span class="required">*</span></label>
+                    <select class="field-input" id="exam" name="exam" required>
+                        <option value="" disabled selected>Tanlang...</option>
+                        {% for exam in exams %}
+                            <option value="{{ exam.id }}">{{ exam.name }}</option>
+                        {% empty %}
+                            <option value="" disabled>Testlar topilmadi</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- DATE + SMENA -->
+                <div class="field-row">
+                    <div class="field">
+                        <label class="field-label">Sana <span class="required">*</span></label>
+                        <input type="date" class="field-input" id="examDate" name="exam_date" required>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Smena <span class="required">*</span></label>
+                        <select class="field-input" id="smena" name="smena" required>
+                            <option value="" disabled selected>Tanlang...</option>
+                            <option value="1">1-smena</option>
+                            <option value="2">2-smena</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CAMERA -->
+                <div class="field camera-section">
+                    <label class="field-label">Kamera <span class="required">*</span></label>
+
+                    <!-- Camera off state -->
+                    <div class="camera-off" id="cameraOff" onclick="startCamera()">
+                        <span class="material-icons-outlined">photo_camera</span>
+                        <p>Kamerani yoqish uchun bosing</p>
+                    </div>
+
+                    <!-- Camera live -->
+                    <div class="camera-viewport" id="cameraView" style="display:none;">
+                        <video id="video" autoplay playsinline muted></video>
+                        <div class="camera-overlay">
+                            <div class="scan-frame"></div>
+                            <span class="scan-hint">Barcode-ni ramkaga joylashtiring</span>
+                        </div>
+                        <div class="camera-controls">
+                            <button type="button" class="btn-switch-cam" id="btnSwitchCam" title="Kamerani almashtirish">
+                                <span class="material-icons" style="font-size:22px;">cameraswitch</span>
+                            </button>
+                            <button type="button" class="btn-capture" id="btnCapture" title="Rasmga olish">
+                                <span class="material-icons">camera</span>
+                            </button>
+                            <div style="width:44px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Preview -->
+                    <div class="preview-section" id="previewSection">
+                        <img class="preview-image" id="previewImage" src="" alt="Olingan rasm">
+                        <div class="preview-actions">
+                            <button type="button" class="btn-retake" onclick="retakePhoto()">
+                                <span class="material-icons">refresh</span>
+                                Qayta olish
+                            </button>
+                        </div>
+                    </div>
+
+                    <canvas id="canvas"></canvas>
+                </div>
+
+                <!-- SUBMIT -->
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <span class="material-icons">send</span>
+                    <span class="btn-text">Yuborish</span>
+                    <div class="spinner"></div>
+                </button>
+
+                <!-- RESULT -->
+                <div class="result-badge" id="resultBadge">
+                    <div class="label">Aniqlangan barcode</div>
+                    <div class="code" id="resultCode"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const cameraOff = document.getElementById('cameraOff');
+    const cameraView = document.getElementById('cameraView');
+    const previewSection = document.getElementById('previewSection');
+    const previewImage = document.getElementById('previewImage');
+
+    let capturedBlob = null;
+    let currentStream = null;
+    let facingMode = 'environment';
+
+    // ===== CAMERA =====
+    async function startCamera() {
+        try {
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+            }
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                audio: false
+            });
+            currentStream = stream;
+            video.srcObject = stream;
+            cameraOff.style.display = 'none';
+            cameraView.style.display = 'block';
+            previewSection.classList.remove('show');
+        } catch (err) {
+            showError("Kameraga ruxsat berilmadi yoki kamera topilmadi.");
+        }
+    }
+
+    // Switch camera
+    document.getElementById('btnSwitchCam').addEventListener('click', () => {
+        facingMode = facingMode === 'environment' ? 'user' : 'environment';
+        startCamera();
+    });
+
+    // Capture
+    document.getElementById('btnCapture').addEventListener('click', () => {
+        const ctx = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob((blob) => {
+            capturedBlob = blob;
+            previewImage.src = URL.createObjectURL(blob);
+            cameraView.style.display = 'none';
+            previewSection.classList.add('show');
+
+            // Stop camera to save battery
+            if (currentStream) {
+                currentStream.getTracks().forEach(t => t.stop());
+                currentStream = null;
+            }
+        }, 'image/jpeg', 0.92);
+    });
+
+    // Retake
+    function retakePhoto() {
+        capturedBlob = null;
+        previewSection.classList.remove('show');
+        startCamera();
+    }
+
+    // ===== MESSAGES =====
+    function showSuccess(msg) {
+        const el = document.getElementById('snackSuccess');
+        document.getElementById('snackError').classList.remove('show');
+        document.getElementById('successText').innerHTML = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 6000);
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('snackError');
+        document.getElementById('snackSuccess').classList.remove('show');
+        document.getElementById('errorText').textContent = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 6000);
+    }
+
+    // ===== FORM SUBMIT =====
+    document.getElementById('scanForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        document.getElementById('snackError').classList.remove('show');
+        document.getElementById('snackSuccess').classList.remove('show');
+        document.getElementById('resultBadge').classList.remove('show');
+
+        if (!capturedBlob) {
+            showError("Iltimos, avval barcode-ni rasmga oling!");
+            return;
+        }
+
+        const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrf) {
+            showError("CSRF token topilmadi!");
+            return;
+        }
+
+        const btn = document.getElementById('btnSubmit');
+        btn.classList.add('loading');
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('exam', document.getElementById('exam').value);
+        formData.append('exam_date', document.getElementById('examDate').value);
+        formData.append('smena', document.getElementById('smena').value);
+        formData.append('image', capturedBlob, 'barcode_scan.jpg');
+
+        try {
+            const res = await fetch('{% url "barcode-scan" %}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrf.value },
+                credentials: 'same-origin',
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.detail || data.message || "Xatolik yuz berdi");
+            }
+
+            showSuccess(`<strong>${data.message}</strong>`);
+
+            // Show result badge
+            document.getElementById('resultCode').textContent = data.code;
+            document.getElementById('resultBadge').classList.add('show');
+
+            // Reset for next scan
+            capturedBlob = null;
+            previewSection.classList.remove('show');
+            startCamera();
+
+        } catch (err) {
+            showError(err.message);
+        } finally {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+        }
+    });
+
+    // Set today's date
+    document.getElementById('examDate').valueAsDate = new Date();
+
+    // Auto-start camera on load
+    window.addEventListener('load', startCamera);
+</script>
+</body>
+</html>

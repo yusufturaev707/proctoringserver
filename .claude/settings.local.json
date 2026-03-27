@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find C:/Applocation/safebrowserv1/config C:/Applocation/safebrowserv1/core C:/Applocation/safebrowserv1/services -type f -not -path */.venv/*)",
+      "Bash(python manage.py makemigrations presence)",
+      "Bash(.venv/Scripts/python.exe manage.py makemigrations presence)",
+      "Bash(.venv/Scripts/pip.exe install:*)",
+      "Bash(.venv/Scripts/python.exe manage.py migrate presence)",
+      "Bash(.venv/Scripts/python.exe -c \":*)",
+      "Bash(pip install:*)",
+      "Bash(xargs ls:*)",
+      "Bash(grep -r \"ws://\\\\|wss://\" /c/Projects/proctoringserver --include=*.py --include=*.md --include=*.txt ! -path */.venv/*)",
+      "Bash(grep:*)",
+      "Bash(for app:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Projects/proctoringserver/apps/**)",
+      "Bash(done)",
+      "Bash(mkdir -p C:/Projects/proctoringserver/apps/barcode)",
+      "Bash(mkdir -p C:/Projects/proctoringserver/templates/barcode)",
+      "Bash(python manage.py check)"
+    ]
+  }
+}

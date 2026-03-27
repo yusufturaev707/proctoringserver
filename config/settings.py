@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     "django_filters",
+    'channels',
 
     # apps
     'apps.regions',
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     'apps.exams',
     'apps.notification',
     'apps.coco_class',
+    'apps.presence',
+    'apps.barcode',
 ]
 
 # ─── Django Unfold ──────────────────────────────────────────────────────────
@@ -192,6 +195,23 @@ UNFOLD = {
                 ],
             },
             {
+                "title": _("Monitoring"),
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Online Dashboard"),
+                        "icon": "monitor_heart",
+                        "link": reverse_lazy("presence_dashboard"),
+                    },
+                    {
+                        "title": _("Ulanish tarixi"),
+                        "icon": "history",
+                        "link": reverse_lazy("admin:presence_presenceconnection_changelist"),
+                    },
+                ],
+            },
+            {
                 "title": _("RDP va Keyboard"),
                 "separator": True,
                 "collapsible": True,
@@ -336,6 +356,16 @@ if os.name == 'nt':  # Windows
 else:  # Linux/Mac
     CELERY_WORKER_POOL = 'prefork'
     CELERY_WORKER_CONCURRENCY = 4
+
+# Channel Layers (Django Channels + Redis)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv('CELERY_BROKER_URL', 'redis://127.0.0.1:6379/0')],
+        },
+    },
+}
 
 # External api settings
 EXTERNAL_API_SETTINGS = {
