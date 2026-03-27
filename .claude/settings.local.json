@@ -17,7 +17,9 @@
       "Bash(done)",
       "Bash(mkdir -p C:/Projects/proctoringserver/apps/barcode)",
       "Bash(mkdir -p C:/Projects/proctoringserver/templates/barcode)",
-      "Bash(python manage.py check)"
+      "Bash(python manage.py check)",
+      "Bash(python manage.py makemigrations barcode)",
+      "Bash(printf \"y\\\\n1\\\\n''''''''\\\\n\")"
     ]
   }
 }
