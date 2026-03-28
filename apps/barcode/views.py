@@ -162,7 +162,8 @@ def barcode_scan(request):
                     'stats': {
                         'total': total,
                         'sent': sent,
-                        'remaining': remaining,
+                        # 'remaining': remaining,
+                        'remaining': 0,
                     }
                 }, status=200)
 
