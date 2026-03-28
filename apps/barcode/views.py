@@ -150,7 +150,8 @@ def barcode_scan(request):
                     smena=smena, region=user_region,
                 )
                 total = BarcodeCode.objects.filter(**filter_params).count()
-                sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
+                # sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
+                sent = BarcodeUpload.objects.filter(**filter_params).count()
                 remaining = total - sent
 
                 msg = "Muvaffaqiyatli yuklandi" if created else "Muvaffaqiyatli yangilandi"
