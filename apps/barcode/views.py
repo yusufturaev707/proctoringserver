@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from PIL import Image
-from pyzbar.pyzbar import decode
+import cv2
+import numpy as np
+import zxingcpp
 
 from apps.barcode.forms import BarcodeUploadForm
 from apps.barcode.models import BarcodeCode
@@ -11,12 +12,76 @@ from apps.exams.models import Test
 from apps.users.models import BarcodeUpload
 
 
+def _try_decode(image):
+    """Bitta rasmda barcode o'qishga urinish."""
+    results = zxingcpp.read_barcodes(image)
+    return results[0].text if results else None
+
+
+def _preprocess_variants(gray):
+    """Har xil shart-sharoit uchun rasmning preprocessed variantlarini yaratish."""
+    variants = []
+
+    # 1. CLAHE — notekis yorug'lik (buklangan qog'oz: bir tarafi yorug', bir tarafi soya)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    variants.append(clahe.apply(gray))
+
+    # 2. Adaptive threshold — kuchli soya/yorug'lik farqi uchun
+    #    Har bir kichik hududni alohida threshold qiladi
+    variants.append(
+        cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                              cv2.THRESH_BINARY, 51, 15)
+    )
+
+    # 3. Yaltiroq plyonka uchun — Gaussian blur yaltiroqni yumshatadi,
+    #    keyin Otsu threshold optimal chegarani topadi
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    _, otsu = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    variants.append(otsu)
+
+    # 4. Ingichka/uzilgan chiziqlar uchun — morphological closing
+    #    Uzilgan barcode chiziqlarini yopib, qayta ulaydi
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
+    closed = cv2.morphologyEx(otsu, cv2.MORPH_CLOSE, kernel, iterations=2)
+    variants.append(closed)
+
+    # 5. Kuchli CLAHE — juda past kontrast (xira rasm) uchun
+    clahe_strong = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))
+    variants.append(clahe_strong.apply(gray))
+
+    return variants
+
+
 def decode_barcode(image_file):
     try:
         image_file.seek(0)
-        img = Image.open(image_file)
-        barcodes = decode(img)
-        return barcodes[0].data.decode('utf-8') if barcodes else None
+        file_bytes = np.frombuffer(image_file.read(), dtype=np.uint8)
+        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+        if img is None:
+            return None
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # Avval oddiy kulrang rasmda urinish (tez)
+        result = _try_decode(gray)
+        if result:
+            return result
+
+        # Har xil preprocessing variantlarini sinash
+        for variant in _preprocess_variants(gray):
+            result = _try_decode(variant)
+            if result:
+                return result
+
+        # Oxirgi urinish: rasmni 2x kattalashtirish (juda kichik barcode uchun)
+        h, w = gray.shape
+        upscaled = cv2.resize(gray, (w * 2, h * 2), interpolation=cv2.INTER_CUBIC)
+        for variant in [upscaled] + _preprocess_variants(upscaled):
+            result = _try_decode(variant)
+            if result:
+                return result
+
+        return None
     except Exception:
         return None
 

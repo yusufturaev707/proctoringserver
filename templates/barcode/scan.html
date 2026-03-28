@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Barcode Scanner</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
@@ -22,6 +22,7 @@
             --success-bg: #E8F5E9;
             --error: #C62828;
             --error-bg: #FFEBEE;
+            --warning: #E65100;
             --shadow-1: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
             --shadow-2: 0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.12);
             --shadow-3: 0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10);
@@ -42,7 +43,7 @@
         /* ===== TOP APP BAR ===== */
         .app-bar {
             background: var(--primary);
-            height: 64px;
+            height: 56px;
             padding: 0 16px;
             display: flex;
             align-items: center;
@@ -56,37 +57,31 @@
         .app-bar-title {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: var(--on-primary);
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 500;
-            letter-spacing: 0.15px;
         }
 
-        .app-bar-title .material-icons-outlined { font-size: 28px; }
+        .app-bar-title .material-icons-outlined { font-size: 24px; }
 
-        .app-bar-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .app-bar-actions { display: flex; align-items: center; gap: 8px; }
 
         .user-chip {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: rgba(255,255,255,0.15);
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
             color: var(--on-primary);
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .user-chip .material-icons { font-size: 20px; }
+        .user-chip .material-icons { font-size: 18px; }
 
         .btn-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px; height: 36px;
             border-radius: 50%;
             border: none;
             background: rgba(255,255,255,0.15);
@@ -95,25 +90,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
             text-decoration: none;
         }
 
         .btn-icon:hover { background: rgba(255,255,255,0.25); }
 
-        /* ===== MAIN CONTAINER ===== */
-        .container {
-            max-width: 600px;
-            margin: 24px auto;
-            padding: 0 16px;
-        }
-
-        /* ===== SNACKBAR (BOTTOM FIXED) ===== */
+        /* ===== SNACKBAR ===== */
         .snackbar-wrapper {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             z-index: 200;
             display: flex;
             justify-content: center;
@@ -122,12 +107,12 @@
         }
 
         .snackbar {
-            padding: 14px 20px;
+            padding: 12px 16px;
             border-radius: var(--radius);
             font-size: 14px;
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             pointer-events: auto;
             max-width: 560px;
             width: 100%;
@@ -141,31 +126,24 @@
         }
 
         .snackbar.show { display: flex; }
-
-        .snackbar-success {
-            background: var(--success);
-            color: #fff;
-        }
-
-        .snackbar-error {
-            background: var(--error);
-            color: #fff;
-        }
-
-        .snackbar .material-icons { font-size: 22px; flex-shrink: 0; }
+        .snackbar-success { background: var(--success); color: #fff; }
+        .snackbar-error { background: var(--error); color: #fff; }
+        .snackbar .material-icons { font-size: 20px; flex-shrink: 0; }
 
         .snackbar .snackbar-close {
             margin-left: auto;
-            background: none;
-            border: none;
+            background: none; border: none;
             color: rgba(255,255,255,0.8);
-            cursor: pointer;
-            padding: 4px;
-            display: flex;
-            align-items: center;
+            cursor: pointer; padding: 4px;
+            display: flex; align-items: center;
         }
 
-        .snackbar .snackbar-close:hover { color: #fff; }
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 540px;
+            margin: 16px auto;
+            padding: 0 12px;
+        }
 
         /* ===== CARD ===== */
         .card {
@@ -173,61 +151,37 @@
             border-radius: 16px;
             box-shadow: var(--shadow-1);
             overflow: hidden;
-            animation: fadeUp 0.4s ease;
         }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .card-body { padding: 16px; }
 
-        .card-header {
-            padding: 20px 24px 16px;
-            border-bottom: 1px solid var(--outline);
-        }
-
-        .card-header h2 {
-            font-size: 18px;
-            font-weight: 500;
-            color: var(--on-surface);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .card-header h2 .material-icons-outlined {
-            color: var(--primary);
-            font-size: 24px;
-        }
-
-        .card-body { padding: 24px; }
-
-        /* ===== FORM FIELDS ===== */
-        .field {
-            margin-bottom: 20px;
+        /* ===== FORM FIELDS (compact row) ===== */
+        .params-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .field-label {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
             color: var(--on-surface-muted);
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
-
-        .field-label .required { color: var(--error); }
 
         .field-input {
             width: 100%;
-            padding: 14px 16px;
+            padding: 10px 12px;
             border: 1.5px solid var(--outline);
-            border-radius: var(--radius);
-            font-size: 15px;
+            border-radius: 8px;
+            font-size: 14px;
             font-family: 'Roboto', sans-serif;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s;
             background: var(--surface);
             color: var(--on-surface);
             -webkit-appearance: none;
@@ -235,29 +189,19 @@
 
         .field-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+            box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.1);
         }
 
         select.field-input {
             cursor: pointer;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23757575' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%23757575' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
+            background-position: right 10px center;
+            padding-right: 28px;
         }
 
-        .field-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        /* ===== CAMERA ===== */
-        .camera-section {
-            margin-bottom: 20px;
-        }
-
-        .camera-viewport {
+        /* ===== SCANNER AREA ===== */
+        .scanner-area {
             position: relative;
             border-radius: var(--radius);
             overflow: hidden;
@@ -265,14 +209,13 @@
             aspect-ratio: 4/3;
         }
 
-        .camera-viewport video {
-            width: 100%;
-            height: 100%;
+        .scanner-area video {
+            width: 100%; height: 100%;
             object-fit: cover;
             display: block;
         }
 
-        .camera-overlay {
+        .scanner-overlay {
             position: absolute;
             inset: 0;
             display: flex;
@@ -284,159 +227,183 @@
 
         .scan-frame {
             width: 85%;
-            aspect-ratio: 2.2/1;
-            border: 2px solid rgba(255,255,255,0.6);
+            aspect-ratio: 2.5/1;
+            border: 2.5px solid rgba(255,255,255,0.7);
             border-radius: 8px;
             position: relative;
+            transition: border-color 0.3s;
         }
 
-        .scan-frame::before {
-            content: '';
+        .scan-frame.detected {
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .scan-line {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 8px; right: 8px;
             height: 2px;
             background: var(--primary-light);
-            animation: scanLine 2s ease-in-out infinite;
             box-shadow: 0 0 8px var(--primary-light);
+            animation: scanLine 2s ease-in-out infinite;
         }
+
+        .scan-line.paused { animation-play-state: paused; }
 
         @keyframes scanLine {
             0%, 100% { top: 0; }
             50% { top: calc(100% - 2px); }
         }
 
-        .scan-hint {
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
-            margin-top: 6px;
-            background: rgba(0,0,0,0.5);
-            padding: 4px 12px;
+        .scan-status {
+            margin-top: 8px;
+            padding: 4px 14px;
             border-radius: 12px;
-        }
-
-        .camera-controls {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 12px;
+            font-size: 12px;
+            font-weight: 500;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.6));
-        }
-
-        .btn-capture {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            border: 4px solid #fff;
-            background: rgba(255,255,255,0.25);
-            cursor: pointer;
-            transition: transform 0.15s, background 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-        }
-
-        .btn-capture:hover {
-            transform: scale(1.08);
-            background: rgba(255,255,255,0.4);
-        }
-
-        .btn-capture:active { transform: scale(0.95); }
-
-        .btn-capture .material-icons {
-            font-size: 32px;
-            color: #fff;
-        }
-
-        .btn-switch-cam {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: auto;
-            transition: background 0.2s;
-        }
-
-        .btn-switch-cam:hover { background: rgba(255,255,255,0.35); }
-
-        /* Camera off state */
-        .camera-off {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: #263238;
-            color: rgba(255,255,255,0.6);
-            aspect-ratio: 4/3;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .camera-off:hover { background: #37474F; }
-        .camera-off .material-icons-outlined { font-size: 56px; margin-bottom: 12px; }
-        .camera-off p { font-size: 14px; }
-
-        /* Preview */
-        .preview-section {
-            display: none;
-        }
-
-        .preview-section.show { display: block; }
-
-        .preview-image {
-            width: 100%;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-1);
-        }
-
-        .preview-actions {
-            margin-top: 12px;
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-retake {
-            display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1.5px solid var(--outline);
-            background: var(--surface);
-            color: var(--on-surface-muted);
-            font-size: 13px;
-            font-family: 'Roboto', sans-serif;
+        }
+
+        .scan-status.scanning {
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .scan-status.found {
+            background: rgba(46, 125, 50, 0.9);
+            color: #fff;
+        }
+
+        .scan-status.waiting {
+            background: rgba(230, 81, 0, 0.85);
+            color: #fff;
+        }
+
+        .scan-status .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .scanner-controls {
+            position: absolute;
+            top: 10px; right: 10px;
+            display: flex;
+            gap: 8px;
+            pointer-events: auto;
+        }
+
+        .btn-cam-control {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
             cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn-retake:hover {
-            background: var(--background);
-            border-color: var(--on-surface-muted);
+        .btn-cam-control:hover { background: rgba(0,0,0,0.7); }
+        .btn-cam-control .material-icons { font-size: 20px; }
+
+        /* ===== PREVIEW STATE ===== */
+        .preview-container {
+            display: none;
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
         }
 
-        .btn-retake .material-icons { font-size: 18px; }
+        .preview-container.show { display: block; }
 
-        canvas { display: none; }
-
-        /* ===== SUBMIT BUTTON ===== */
-        .btn-submit {
+        .preview-container img {
             width: 100%;
+            display: block;
+            border-radius: var(--radius);
+        }
+
+        .preview-badge {
+            position: absolute;
+            top: 10px; left: 10px;
+            background: rgba(46, 125, 50, 0.9);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .preview-badge .material-icons { font-size: 16px; }
+
+        /* ===== RESULT SECTION ===== */
+        .result-section {
+            display: none;
+            margin-top: 14px;
+            animation: fadeUp 0.4s ease;
+        }
+
+        .result-section.show { display: block; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card {
             padding: 16px;
+            border-radius: var(--radius);
+            background: var(--success-bg);
+            border: 1.5px solid #A5D6A7;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .result-card .icon {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .result-card .icon .material-icons { color: #fff; font-size: 26px; }
+
+        .result-card .code {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--success);
+            font-family: 'Roboto Mono', monospace;
+            letter-spacing: 1.5px;
+        }
+
+        .result-card .label {
+            font-size: 11px;
+            color: var(--on-surface-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .btn-scan-again {
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px;
             background: var(--primary);
             color: var(--on-primary);
             border: none;
@@ -445,50 +412,21 @@
             font-weight: 500;
             font-family: 'Roboto', sans-serif;
             cursor: pointer;
-            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
             box-shadow: var(--shadow-1);
+            transition: background 0.2s;
         }
 
-        .btn-submit:hover {
-            background: var(--primary-light);
-            box-shadow: var(--shadow-2);
-            transform: translateY(-1px);
-        }
-
-        .btn-submit:active { transform: translateY(0); }
-
-        .btn-submit:disabled {
-            background: #BDBDBD;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-submit .spinner {
-            display: none;
-            width: 22px;
-            height: 22px;
-            border: 2.5px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .btn-submit.loading .btn-text { display: none; }
-        .btn-submit.loading .spinner { display: block; }
-        .btn-submit.loading .material-icons { display: none; }
+        .btn-scan-again:hover { background: var(--primary-light); }
+        .btn-scan-again .material-icons { font-size: 20px; }
 
         /* ===== STATS PANEL ===== */
         .stats-panel {
             display: none;
-            margin-top: 20px;
+            margin-top: 14px;
             border-radius: var(--radius);
             border: 1.5px solid var(--outline);
             overflow: hidden;
@@ -497,20 +435,20 @@
         .stats-panel.show { display: block; }
 
         .stats-header {
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: var(--background);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             color: var(--on-surface-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             border-bottom: 1px solid var(--outline);
         }
 
-        .stats-header .material-icons-outlined { font-size: 18px; }
+        .stats-header .material-icons-outlined { font-size: 16px; }
 
         .stats-grid {
             display: grid;
@@ -518,7 +456,7 @@
         }
 
         .stat-item {
-            padding: 16px 12px;
+            padding: 14px 10px;
             text-align: center;
             position: relative;
         }
@@ -526,22 +464,20 @@
         .stat-item:not(:last-child)::after {
             content: '';
             position: absolute;
-            right: 0;
-            top: 12px;
-            bottom: 12px;
+            right: 0; top: 10px; bottom: 10px;
             width: 1px;
             background: var(--outline);
         }
 
         .stat-value {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             line-height: 1;
             margin-bottom: 4px;
         }
 
         .stat-label {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 500;
             color: var(--on-surface-muted);
             text-transform: uppercase;
@@ -550,95 +486,81 @@
 
         .stat-total .stat-value { color: var(--primary); }
         .stat-sent .stat-value { color: var(--success); }
-        .stat-remaining .stat-value { color: #E65100; }
+        .stat-remaining .stat-value { color: var(--warning); }
 
-        .stats-progress {
-            padding: 0 16px 16px;
-        }
+        .stats-progress { padding: 0 14px 12px; }
 
         .progress-bar {
-            height: 8px;
+            height: 6px;
             background: #E0E0E0;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--success), #43A047);
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.6s ease;
             width: 0%;
         }
 
         .progress-text {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--on-surface-muted);
-            margin-top: 6px;
+            margin-top: 4px;
             text-align: right;
         }
 
-        /* ===== RESULT BADGE ===== */
-        .result-badge {
+        /* ===== SENDING OVERLAY ===== */
+        .sending-overlay {
             display: none;
-            margin-top: 16px;
-            padding: 16px 20px;
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
             border-radius: var(--radius);
-            background: var(--success-bg);
-            border: 1px solid #A5D6A7;
+            z-index: 10;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .result-badge.show { display: flex; align-items: center; gap: 12px; }
+        .sending-overlay.show { display: flex; }
 
-        .result-badge .material-icons {
-            font-size: 28px;
-            color: var(--success);
+        .sending-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
         }
 
-        .result-info { flex: 1; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .result-badge .code {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--success);
-            font-family: 'Roboto Mono', monospace;
-            letter-spacing: 2px;
+        .sending-text {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
         }
 
-        .result-badge .label {
-            font-size: 11px;
-            color: var(--on-surface-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
+        canvas { display: none; }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 600px) {
-            .app-bar { height: 56px; padding: 0 12px; }
-            .app-bar-title { font-size: 18px; gap: 8px; }
-            .app-bar-title .material-icons-outlined { font-size: 24px; }
-
+        @media (max-width: 480px) {
+            .params-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .params-row .field:first-child {
+                grid-column: 1 / -1;
+            }
             .user-chip span:not(.material-icons) { display: none; }
-            .user-chip { padding: 6px 10px; }
-
-            .container { margin: 16px auto; padding: 0 12px; }
-            .card-body { padding: 20px 16px; }
-            .card-header { padding: 16px 16px 12px; }
-
-            .field-row { grid-template-columns: 1fr; gap: 0; }
-            .field-input { font-size: 16px; padding: 12px 14px; }
-
-            .btn-capture { width: 56px; height: 56px; }
-            .btn-capture .material-icons { font-size: 28px; }
-            .btn-switch-cam { width: 40px; height: 40px; }
-
-            .scan-frame { width: 90%; }
+            .field-input { font-size: 16px; }
         }
 
         @media (max-width: 360px) {
-            .card-body { padding: 16px 12px; }
-            .field-input { padding: 11px 12px; }
+            .card-body { padding: 12px; }
+            .params-row { gap: 6px; }
         }
     </style>
 </head>
@@ -656,12 +578,12 @@
             <span>{{ user.username }}</span>
         </div>
         <a href="{% url 'logout' %}" class="btn-icon" title="Chiqish">
-            <span class="material-icons" style="font-size:22px;">logout</span>
+            <span class="material-icons" style="font-size:20px;">logout</span>
         </a>
     </div>
 </header>
 
-<!-- BOTTOM SNACKBARS -->
+<!-- SNACKBARS -->
 <div class="snackbar-wrapper">
     <div class="snackbar snackbar-success" id="snackSuccess">
         <span class="material-icons">check_circle</span>
@@ -682,102 +604,86 @@
 <!-- MAIN -->
 <div class="container">
     <div class="card">
-        <div class="card-header">
-            <h2>
-                <span class="material-icons-outlined">document_scanner</span>
-                Barcode skanerlash
-            </h2>
-        </div>
-
         <div class="card-body">
             <form id="scanForm" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <!-- EXAM -->
-                <div class="field">
-                    <label class="field-label">Testni tanlang <span class="required">*</span></label>
-                    <select class="field-input" id="exam" name="exam" required>
-                        <option value="" disabled selected>Tanlang...</option>
-                        {% for exam in exams %}
-                            <option value="{{ exam.id }}">{{ exam.name }}</option>
-                        {% empty %}
-                            <option value="" disabled>Testlar topilmadi</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- DATE + SMENA -->
-                <div class="field-row">
+                <!-- PARAMS ROW -->
+                <div class="params-row">
                     <div class="field">
-                        <label class="field-label">Sana <span class="required">*</span></label>
+                        <label class="field-label">Test</label>
+                        <select class="field-input" id="exam" name="exam" required>
+                            <option value="" disabled selected>Tanlang</option>
+                            {% for exam in exams %}
+                                <option value="{{ exam.id }}">{{ exam.name }}</option>
+                            {% empty %}
+                                <option value="" disabled>Topilmadi</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="field-label">Sana</label>
                         <input type="date" class="field-input" id="examDate" name="exam_date" required>
                     </div>
                     <div class="field">
-                        <label class="field-label">Smena <span class="required">*</span></label>
+                        <label class="field-label">Smena</label>
                         <select class="field-input" id="smena" name="smena" required>
-                            <option value="" disabled selected>Tanlang...</option>
-                            <option value="1">1-smena</option>
-                            <option value="2">2-smena</option>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- CAMERA -->
-                <div class="field camera-section">
-                    <label class="field-label">Kamera <span class="required">*</span></label>
-
-                    <!-- Camera off state -->
-                    <div class="camera-off" id="cameraOff" onclick="startCamera()">
-                        <span class="material-icons-outlined">photo_camera</span>
-                        <p>Kamerani yoqish uchun bosing</p>
-                    </div>
-
-                    <!-- Camera live -->
-                    <div class="camera-viewport" id="cameraView" style="display:none;">
-                        <video id="video" autoplay playsinline muted></video>
-                        <div class="camera-overlay">
-                            <div class="scan-frame"></div>
-                            <span class="scan-hint">Barcode-ni ramkaga joylashtiring</span>
+                <!-- SCANNER -->
+                <div class="scanner-area" id="scannerArea">
+                    <video id="video" autoplay playsinline muted></video>
+                    <div class="scanner-overlay">
+                        <div class="scan-frame" id="scanFrame">
+                            <div class="scan-line" id="scanLine"></div>
                         </div>
-                        <div class="camera-controls">
-                            <button type="button" class="btn-switch-cam" id="btnSwitchCam" title="Kamerani almashtirish">
-                                <span class="material-icons" style="font-size:22px;">cameraswitch</span>
-                            </button>
-                            <button type="button" class="btn-capture" id="btnCapture" title="Rasmga olish">
-                                <span class="material-icons">camera</span>
-                            </button>
-                            <div style="width:44px;"></div>
+                        <div class="scan-status scanning" id="scanStatus">
+                            <span class="dot"></span>
+                            <span id="scanStatusText">Parametrlarni tanlang</span>
                         </div>
                     </div>
-
-                    <!-- Preview -->
-                    <div class="preview-section" id="previewSection">
-                        <img class="preview-image" id="previewImage" src="" alt="Olingan rasm">
-                        <div class="preview-actions">
-                            <button type="button" class="btn-retake" onclick="retakePhoto()">
-                                <span class="material-icons">refresh</span>
-                                Qayta olish
-                            </button>
-                        </div>
+                    <div class="scanner-controls">
+                        <button type="button" class="btn-cam-control" id="btnSwitchCam" title="Kamerani almashtirish">
+                            <span class="material-icons">cameraswitch</span>
+                        </button>
                     </div>
-
-                    <canvas id="canvas"></canvas>
+                    <div class="sending-overlay" id="sendingOverlay">
+                        <div class="sending-spinner"></div>
+                        <div class="sending-text">Tekshirilmoqda...</div>
+                    </div>
                 </div>
 
-                <!-- SUBMIT -->
-                <button type="submit" class="btn-submit" id="btnSubmit">
-                    <span class="material-icons">send</span>
-                    <span class="btn-text">Yuborish</span>
-                    <div class="spinner"></div>
-                </button>
+                <!-- PREVIEW (after detection) -->
+                <div class="preview-container" id="previewContainer">
+                    <img id="previewImage" src="" alt="Barcode">
+                    <div class="preview-badge">
+                        <span class="material-icons">check_circle</span>
+                        Aniqlandi
+                    </div>
+                </div>
+
+                <canvas id="canvas"></canvas>
 
                 <!-- RESULT -->
-                <div class="result-badge" id="resultBadge">
-                    <span class="material-icons">verified</span>
-                    <div class="result-info">
-                        <div class="label">Aniqlangan barcode</div>
-                        <div class="code" id="resultCode"></div>
+                <div class="result-section" id="resultSection">
+                    <div class="result-card">
+                        <div class="icon">
+                            <span class="material-icons">verified</span>
+                        </div>
+                        <div>
+                            <div class="label">Aniqlangan barcode</div>
+                            <div class="code" id="resultCode"></div>
+                        </div>
                     </div>
+                    <button type="button" class="btn-scan-again" id="btnScanAgain">
+                        <span class="material-icons">qr_code_scanner</span>
+                        Keyingi barcode
+                    </button>
                 </div>
 
                 <!-- STATS -->
@@ -813,212 +719,358 @@
 </div>
 
 <script>
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const cameraOff = document.getElementById('cameraOff');
-    const cameraView = document.getElementById('cameraView');
-    const previewSection = document.getElementById('previewSection');
-    const previewImage = document.getElementById('previewImage');
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const scannerArea = document.getElementById('scannerArea');
+const previewContainer = document.getElementById('previewContainer');
+const previewImage = document.getElementById('previewImage');
+const scanFrame = document.getElementById('scanFrame');
+const scanLine = document.getElementById('scanLine');
+const scanStatus = document.getElementById('scanStatus');
+const scanStatusText = document.getElementById('scanStatusText');
+const sendingOverlay = document.getElementById('sendingOverlay');
+const resultSection = document.getElementById('resultSection');
 
-    let capturedBlob = null;
-    let currentStream = null;
-    let facingMode = 'environment';
+let currentStream = null;
+let facingMode = 'environment';
+let scanLoopId = null;
+let isSending = false;
+let isDetected = false;
 
-    // ===== CAMERA =====
-    async function startCamera() {
-        try {
-            if (currentStream) {
-                currentStream.getTracks().forEach(t => t.stop());
-            }
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
-                audio: false
-            });
-            currentStream = stream;
-            video.srcObject = stream;
-            cameraOff.style.display = 'none';
-            cameraView.style.display = 'block';
-            previewSection.classList.remove('show');
-        } catch (err) {
-            showError("Kameraga ruxsat berilmadi yoki kamera topilmadi.");
+// Client-side BarcodeDetector (brauzerda bor bo'lsa)
+const hasBarcodeDetector = 'BarcodeDetector' in window;
+let clientDetector = null;
+if (hasBarcodeDetector) {
+    clientDetector = new BarcodeDetector({ formats: [
+        'code_128', 'code_39', 'code_93', 'ean_13', 'ean_8',
+        'upc_a', 'upc_e', 'itf', 'codabar'
+    ]});
+}
+
+// Client topilmagan holatda backendga yuborish uchun hisoblagich
+// Har 300ms client tekshiradi, 10 marta topilmasa (3s) — backendga yuboradi
+const CLIENT_TRIES_BEFORE_SERVER = 10;
+let clientFailCount = 0;
+
+// ===== CAMERA =====
+async function startCamera() {
+    try {
+        if (currentStream) {
+            currentStream.getTracks().forEach(t => t.stop());
         }
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+            audio: false
+        });
+        currentStream = stream;
+        video.srcObject = stream;
+        await video.play();
+    } catch (err) {
+        showError("Kameraga ruxsat berilmadi yoki kamera topilmadi.");
     }
+}
 
-    // Switch camera
-    document.getElementById('btnSwitchCam').addEventListener('click', () => {
-        facingMode = facingMode === 'environment' ? 'user' : 'environment';
-        startCamera();
+function stopCamera() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(t => t.stop());
+        currentStream = null;
+    }
+}
+
+document.getElementById('btnSwitchCam').addEventListener('click', () => {
+    facingMode = facingMode === 'environment' ? 'user' : 'environment';
+    startCamera();
+});
+
+// ===== SCAN FRAME COORDINATES =====
+function getFrameRect() {
+    const vw = video.videoWidth;
+    const vh = video.videoHeight;
+    if (!vw || !vh) return null;
+    const frameW = vw * 0.85;
+    const frameH = frameW / 2.5;
+    const frameX = (vw - frameW) / 2;
+    const frameY = (vh - frameH) / 2;
+    return { frameX, frameY, frameW, frameH };
+}
+
+// Canvas ga scan-frame qismini chizish
+function drawFrameToCanvas() {
+    const rect = getFrameRect();
+    if (!rect) return false;
+    canvas.width = rect.frameW;
+    canvas.height = rect.frameH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, rect.frameX, rect.frameY, rect.frameW, rect.frameH,
+                         0, 0, rect.frameW, rect.frameH);
+    return true;
+}
+
+function captureBlob() {
+    return new Promise(resolve => {
+        canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.85);
     });
+}
 
-    // Capture — faqat scan-frame ichidagi qismni kesib olish
-    document.getElementById('btnCapture').addEventListener('click', () => {
-        const vw = video.videoWidth;
-        const vh = video.videoHeight;
+// ===== 1-BOSQICH: CLIENT-SIDE DETECTION =====
+async function tryClientDetect() {
+    if (!clientDetector) return null;
+    if (!drawFrameToCanvas()) return null;
+    try {
+        const results = await clientDetector.detect(canvas);
+        if (results.length > 0) return results[0].rawValue;
+    } catch (e) { /* ignore */ }
+    return null;
+}
 
-        // scan-frame: 85% width, aspect-ratio 2.2:1, markazda
-        const frameW = vw * 0.85;
-        const frameH = frameW / 2.2;
-        const frameX = (vw - frameW) / 2;
-        const frameY = (vh - frameH) / 2;
+// ===== 2-BOSQICH: BACKEND DETECTION =====
+async function tryServerDetect() {
+    if (!drawFrameToCanvas()) return null;
+    const blob = await captureBlob();
+    if (!blob) return null;
 
-        // Crop canvas — faqat barcode qismi
-        canvas.width = frameW;
-        canvas.height = frameH;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, frameX, frameY, frameW, frameH, 0, 0, frameW, frameH);
+    isSending = true;
+    sendingOverlay.classList.add('show');
 
-        canvas.toBlob((blob) => {
-            capturedBlob = blob;
-            previewImage.src = URL.createObjectURL(blob);
-            cameraView.style.display = 'none';
-            previewSection.classList.add('show');
+    const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+    const formData = new FormData();
+    formData.append('exam', document.getElementById('exam').value);
+    formData.append('exam_date', document.getElementById('examDate').value);
+    formData.append('smena', document.getElementById('smena').value);
+    formData.append('image', blob, 'barcode_scan.jpg');
 
-            // Stop camera to save battery
-            if (currentStream) {
-                currentStream.getTracks().forEach(t => t.stop());
-                currentStream = null;
-            }
-        }, 'image/jpeg', 0.92);
-    });
+    try {
+        const res = await fetch('{% url "barcode-scan" %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrf.value },
+            credentials: 'same-origin',
+            body: formData
+        });
+        const data = await res.json();
+        if (res.ok && data.code) {
+            onBarcodeDetected(blob, data);
+            return data.code;
+        }
+    } catch (err) { /* tarmoq xatosi — davom etadi */ }
+    finally {
+        isSending = false;
+        sendingOverlay.classList.remove('show');
+    }
+    return null;
+}
 
-    // Retake
-    function retakePhoto() {
-        capturedBlob = null;
-        previewSection.classList.remove('show');
-        startCamera();
+// Client topsa — backendga faqat saqlash uchun yuborish
+async function submitToServer(code, blob) {
+    const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+    const formData = new FormData();
+    formData.append('exam', document.getElementById('exam').value);
+    formData.append('exam_date', document.getElementById('examDate').value);
+    formData.append('smena', document.getElementById('smena').value);
+    formData.append('image', blob, 'barcode_scan.jpg');
+
+    try {
+        const res = await fetch('{% url "barcode-scan" %}', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrf.value },
+            credentials: 'same-origin',
+            body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+            onBarcodeDetected(blob, data);
+        } else {
+            // Backend rad etdi (masalan, kod mos kelmadi)
+            showError(data.detail || "Xatolik yuz berdi");
+            isDetected = false;
+            startScanning();
+        }
+    } catch (err) {
+        showError("Tarmoq xatosi");
+        isDetected = false;
+        startScanning();
+    }
+}
+
+// ===== SCAN LOOP =====
+function startScanning() {
+    stopScanning();
+    isDetected = false;
+    clientFailCount = 0;
+
+    if (!paramsReady()) {
+        setScanStatus('waiting', 'Parametrlarni tanlang');
+        return;
     }
 
-    // ===== MESSAGES =====
-    function showSuccess(msg) {
-        const el = document.getElementById('snackSuccess');
-        document.getElementById('snackError').classList.remove('show');
-        document.getElementById('successText').innerHTML = msg;
-        el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 6000);
-    }
+    setScanStatus('scanning', 'Skanerlash...');
+    scanLine.classList.remove('paused');
 
-    function showError(msg) {
-        const el = document.getElementById('snackError');
-        document.getElementById('snackSuccess').classList.remove('show');
-        document.getElementById('errorText').textContent = msg;
-        el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 6000);
-    }
-
-    // ===== STATS =====
-    function updateStatsUI(stats) {
-        const panel = document.getElementById('statsPanel');
-        document.getElementById('statTotal').textContent = stats.total;
-        document.getElementById('statSent').textContent = stats.sent;
-        document.getElementById('statRemaining').textContent = stats.remaining;
-
-        const pct = stats.total > 0 ? Math.round((stats.sent / stats.total) * 100) : 0;
-        document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('progressText').textContent = `${stats.sent} / ${stats.total} (${pct}%)`;
-
-        panel.classList.add('show');
-    }
-
-    async function loadStats() {
-        const exam = document.getElementById('exam').value;
-        const examDate = document.getElementById('examDate').value;
-        const smena = document.getElementById('smena').value;
-
-        if (!exam || !examDate || !smena) {
-            document.getElementById('statsPanel').classList.remove('show');
+    async function tick() {
+        if (isDetected) return;
+        if (!paramsReady()) {
+            stopScanning();
+            setScanStatus('waiting', 'Parametrlarni tanlang');
             return;
         }
 
-        try {
-            const params = new URLSearchParams({ exam, exam_date: examDate, smena });
-            const res = await fetch(`{% url "barcode-stats" %}?${params}`, {
-                credentials: 'same-origin'
-            });
-            const data = await res.json();
-            updateStatsUI(data);
-        } catch (err) {
-            // Statistikani yuklab bo'lmasa, panelni yashirish
-            document.getElementById('statsPanel').classList.remove('show');
+        // 1-bosqich: client-side tekshirish (bepul, tez)
+        if (clientDetector && !isSending) {
+            const code = await tryClientDetect();
+            if (code) {
+                isDetected = true;
+                stopScanning();
+                setScanStatus('found', 'Topildi! Saqlanmoqda...');
+
+                // Backendga faqat saqlash uchun yuborish
+                const blob = await captureBlob();
+                await submitToServer(code, blob);
+                return;
+            }
+            clientFailCount++;
         }
+
+        // 2-bosqich: client topa olmasa, backendga yuborish
+        // clientDetector bo'lmasa — har 3s da serverga, bo'lsa — client 10 marta fail bo'lganda
+        const shouldTryServer = !clientDetector
+            ? true  // BarcodeDetector yo'q — har doim serverga
+            : clientFailCount >= CLIENT_TRIES_BEFORE_SERVER;
+
+        if (shouldTryServer && !isSending) {
+            clientFailCount = 0;
+            setScanStatus('scanning', 'Server tekshirmoqda...');
+            const code = await tryServerDetect();
+            if (code) return; // onBarcodeDetected ichida chaqirildi
+            setScanStatus('scanning', 'Skanerlash...');
+        }
+
+        // Keyingi tick
+        scanLoopId = setTimeout(tick, 300);
     }
 
-    // Parametrlar o'zgarganda statistikani yangilash
-    document.getElementById('exam').addEventListener('change', loadStats);
-    document.getElementById('examDate').addEventListener('change', loadStats);
-    document.getElementById('smena').addEventListener('change', loadStats);
+    scanLoopId = setTimeout(tick, 300);
+}
 
-    // ===== FORM SUBMIT =====
-    document.getElementById('scanForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+function stopScanning() {
+    if (scanLoopId) {
+        clearTimeout(scanLoopId);
+        scanLoopId = null;
+    }
+    scanLine.classList.add('paused');
+}
 
-        document.getElementById('snackError').classList.remove('show');
-        document.getElementById('snackSuccess').classList.remove('show');
-        document.getElementById('resultBadge').classList.remove('show');
+function paramsReady() {
+    return document.getElementById('exam').value
+        && document.getElementById('examDate').value
+        && document.getElementById('smena').value;
+}
 
-        if (!capturedBlob) {
-            showError("Iltimos, avval barcode-ni rasmga oling!");
-            return;
-        }
+function setScanStatus(type, text) {
+    scanStatus.className = 'scan-status ' + type;
+    scanStatusText.textContent = text;
+}
 
-        const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
-        if (!csrf) {
-            showError("CSRF token topilmadi!");
-            return;
-        }
+// ===== ON BARCODE DETECTED =====
+function onBarcodeDetected(blob, data) {
+    isDetected = true;
+    stopScanning();
 
-        const btn = document.getElementById('btnSubmit');
-        btn.classList.add('loading');
-        btn.disabled = true;
+    // Preview
+    if (blob instanceof Blob) {
+        previewImage.src = URL.createObjectURL(blob);
+    }
+    scannerArea.style.display = 'none';
+    previewContainer.classList.add('show');
 
-        const formData = new FormData();
-        formData.append('exam', document.getElementById('exam').value);
-        formData.append('exam_date', document.getElementById('examDate').value);
-        formData.append('smena', document.getElementById('smena').value);
-        formData.append('image', capturedBlob, 'barcode_scan.jpg');
+    // Natija
+    document.getElementById('resultCode').textContent = data.code;
+    resultSection.classList.add('show');
 
-        try {
-            const res = await fetch('{% url "barcode-scan" %}', {
-                method: 'POST',
-                headers: { 'X-CSRFToken': csrf.value },
-                credentials: 'same-origin',
-                body: formData
-            });
+    scanFrame.classList.add('detected');
+    stopCamera();
+    showSuccess(data.message);
 
-            const data = await res.json();
+    if (data.stats) updateStatsUI(data.stats);
+}
 
-            if (!res.ok) {
-                throw new Error(data.detail || data.message || "Xatolik yuz berdi");
-            }
+// ===== SCAN AGAIN =====
+document.getElementById('btnScanAgain').addEventListener('click', () => {
+    isDetected = false;
+    scanFrame.classList.remove('detected');
+    previewContainer.classList.remove('show');
+    resultSection.classList.remove('show');
+    scannerArea.style.display = '';
 
-            showSuccess(`<strong>${data.message}</strong>`);
+    startCamera().then(() => startScanning());
+});
 
-            // Show result badge
-            document.getElementById('resultCode').textContent = data.code;
-            document.getElementById('resultBadge').classList.add('show');
+// ===== MESSAGES =====
+function showSuccess(msg) {
+    const el = document.getElementById('snackSuccess');
+    document.getElementById('snackError').classList.remove('show');
+    document.getElementById('successText').innerHTML = `<strong>${msg}</strong>`;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+}
 
-            // Statistikani yangilash
-            if (data.stats) {
-                updateStatsUI(data.stats);
-            }
+function showError(msg) {
+    const el = document.getElementById('snackError');
+    document.getElementById('snackSuccess').classList.remove('show');
+    document.getElementById('errorText').textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 5000);
+}
 
-            // Reset for next scan
-            capturedBlob = null;
-            previewSection.classList.remove('show');
-            startCamera();
+// ===== STATS =====
+function updateStatsUI(stats) {
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statSent').textContent = stats.sent;
+    document.getElementById('statRemaining').textContent = stats.remaining;
 
-        } catch (err) {
-            showError(err.message);
-        } finally {
-            btn.classList.remove('loading');
-            btn.disabled = false;
-        }
-    });
+    const pct = stats.total > 0 ? Math.round((stats.sent / stats.total) * 100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `${stats.sent} / ${stats.total} (${pct}%)`;
 
-    // Set today's date
-    document.getElementById('examDate').valueAsDate = new Date();
+    document.getElementById('statsPanel').classList.add('show');
+}
 
-    // Auto-start camera on load
-    window.addEventListener('load', startCamera);
+async function loadStats() {
+    const exam = document.getElementById('exam').value;
+    const examDate = document.getElementById('examDate').value;
+    const smena = document.getElementById('smena').value;
+
+    if (!exam || !examDate || !smena) {
+        document.getElementById('statsPanel').classList.remove('show');
+        return;
+    }
+
+    try {
+        const params = new URLSearchParams({ exam, exam_date: examDate, smena });
+        const res = await fetch(`{% url "barcode-stats" %}?${params}`, { credentials: 'same-origin' });
+        const data = await res.json();
+        updateStatsUI(data);
+    } catch (err) {
+        document.getElementById('statsPanel').classList.remove('show');
+    }
+}
+
+// ===== PARAM CHANGES =====
+function onParamChange() {
+    loadStats();
+    if (!isDetected) startScanning();
+}
+
+document.getElementById('exam').addEventListener('change', onParamChange);
+document.getElementById('examDate').addEventListener('change', onParamChange);
+document.getElementById('smena').addEventListener('change', onParamChange);
+
+// ===== INIT =====
+document.getElementById('examDate').valueAsDate = new Date();
+document.getElementById('scanForm').addEventListener('submit', e => e.preventDefault());
+
+startCamera().then(() => {
+    if (paramsReady()) startScanning();
+    else setScanStatus('waiting', 'Parametrlarni tanlang');
+});
 </script>
 </body>
 </html>
