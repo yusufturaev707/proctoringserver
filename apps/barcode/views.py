@@ -22,30 +22,30 @@ def _preprocess_variants(gray):
     """Har xil shart-sharoit uchun rasmning preprocessed variantlarini yaratish."""
     variants = []
 
-    # 1. CLAHE — notekis yorug'lik (buklangan qog'oz: bir tarafi yorug', bir tarafi soya)
+    # 1. CLAHE вЂ” notekis yorug'lik (buklangan qog'oz: bir tarafi yorug', bir tarafi soya)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     variants.append(clahe.apply(gray))
 
-    # 2. Adaptive threshold — kuchli soya/yorug'lik farqi uchun
+    # 2. Adaptive threshold вЂ” kuchli soya/yorug'lik farqi uchun
     #    Har bir kichik hududni alohida threshold qiladi
     variants.append(
         cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                               cv2.THRESH_BINARY, 51, 15)
     )
 
-    # 3. Yaltiroq plyonka uchun — Gaussian blur yaltiroqni yumshatadi,
+    # 3. Yaltiroq plyonka uchun вЂ” Gaussian blur yaltiroqni yumshatadi,
     #    keyin Otsu threshold optimal chegarani topadi
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
     _, otsu = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     variants.append(otsu)
 
-    # 4. Ingichka/uzilgan chiziqlar uchun — morphological closing
+    # 4. Ingichka/uzilgan chiziqlar uchun вЂ” morphological closing
     #    Uzilgan barcode chiziqlarini yopib, qayta ulaydi
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 1))
     closed = cv2.morphologyEx(otsu, cv2.MORPH_CLOSE, kernel, iterations=2)
     variants.append(closed)
 
-    # 5. Kuchli CLAHE — juda past kontrast (xira rasm) uchun
+    # 5. Kuchli CLAHE вЂ” juda past kontrast (xira rasm) uchun
     clahe_strong = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))
     variants.append(clahe_strong.apply(gray))
 
