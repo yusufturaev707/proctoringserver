@@ -1,0 +1,301 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Barcode yuklamalarni tekshirish{% endblock %}
+
+{% block content %}
+<style>
+    .val-container {
+        max-width: 640px;
+        margin: 24px auto;
+        padding: 0 16px;
+    }
+
+    .val-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        overflow: hidden;
+    }
+
+    .val-header {
+        background: linear-gradient(135deg, #2E7D32, #43A047);
+        padding: 24px;
+        color: #fff;
+    }
+
+    .val-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .val-header p {
+        margin: 8px 0 0;
+        font-size: 13px;
+        opacity: 0.85;
+    }
+
+    .val-body {
+        padding: 24px;
+    }
+
+    .val-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .val-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .val-field label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #757575;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .val-field select,
+    .val-field input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #E0E0E0;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #fff;
+        color: #212121;
+        -webkit-appearance: none;
+    }
+
+    .val-field select {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%23757575' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+    }
+
+    .val-field select:focus,
+    .val-field input:focus {
+        border-color: #2E7D32;
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12);
+    }
+
+    .val-info {
+        background: #E8F5E9;
+        border: 1px solid #A5D6A7;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 13px;
+        color: #2E7D32;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .val-info .material-symbols-outlined {
+        font-size: 20px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .val-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .val-btn {
+        padding: 12px 28px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Roboto', sans-serif;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .val-btn-cancel {
+        background: #F5F5F5;
+        color: #757575;
+        text-decoration: none;
+    }
+
+    .val-btn-cancel:hover {
+        background: #EEEEEE;
+    }
+
+    .val-btn-submit {
+        background: #2E7D32;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+    }
+
+    .val-btn-submit:hover {
+        background: #388E3C;
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+    }
+
+    .val-btn-submit:disabled {
+        background: #BDBDBD;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    .val-messages {
+        margin-bottom: 16px;
+    }
+
+    .val-msg {
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .val-msg-success {
+        background: #E8F5E9;
+        color: #2E7D32;
+        border: 1px solid #A5D6A7;
+    }
+
+    .val-msg-error {
+        background: #FFEBEE;
+        color: #C62828;
+        border: 1px solid #EF9A9A;
+    }
+
+    .val-msg-warning {
+        background: #FFF8E1;
+        color: #E65100;
+        border: 1px solid #FFE082;
+    }
+
+    @media (max-width: 480px) {
+        .val-row {
+            grid-template-columns: 1fr;
+        }
+        .val-actions {
+            flex-direction: column;
+        }
+        .val-btn {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="val-container">
+    {% if messages %}
+    <div class="val-messages">
+        {% for message in messages %}
+        <div class="val-msg {% if message.tags == 'success' %}val-msg-success{% elif message.tags == 'warning' %}val-msg-warning{% else %}val-msg-error{% endif %}">
+            <span class="material-symbols-outlined" style="font-size: 18px;">
+                {% if message.tags == 'success' %}check_circle{% elif message.tags == 'warning' %}warning{% else %}error{% endif %}
+            </span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="val-card">
+        <div class="val-header">
+            <h2>
+                <span class="material-symbols-outlined">fact_check</span>
+                Barcode yuklamalarni tekshirish
+            </h2>
+            <p>Yuklangan barcodelarni BarcodeCode jadvaliga solishtirish</p>
+        </div>
+        <div class="val-body">
+            <form method="post" id="validateForm">
+                {% csrf_token %}
+
+                <div class="val-row">
+                    <div class="val-field">
+                        <label for="exam">Imtihon</label>
+                        <select name="exam" id="exam" required>
+                            <option value="" disabled selected>Tanlang...</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam.id }}">{{ exam.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="val-field">
+                        <label for="region">Viloyat</label>
+                        <select name="region" id="region" required>
+                            <option value="" disabled selected>Tanlang...</option>
+                            {% for region in regions %}
+                            <option value="{{ region.id }}">{{ region.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="val-row">
+                    <div class="val-field">
+                        <label for="exam_date">Imtihon sanasi</label>
+                        <input type="date" name="exam_date" id="exam_date" required>
+                    </div>
+                    <div class="val-field">
+                        <label for="smena">Smena</label>
+                        <select name="smena" id="smena" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1-smena</option>
+                            <option value="2">2-smena</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="val-info">
+                    <span class="material-symbols-outlined">info</span>
+                    <span>
+                        Tanlangan parametrlarga mos barcha yuklamalar tekshiriladi:<br>
+                        <strong>Kod BarcodeCode da bor</strong> → yuklama is_valid=True, kod is_sent=True<br>
+                        <strong>Kod BarcodeCode da yo'q</strong> → yuklama is_valid=False
+                    </span>
+                </div>
+
+                <div class="val-actions">
+                    <a href="{% url 'admin:users_barcodeupload_changelist' %}" class="val-btn val-btn-cancel">
+                        Bekor qilish
+                    </a>
+                    <button type="submit" class="val-btn val-btn-submit" id="submitBtn">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">verified</span>
+                        Tekshirishni boshlash
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('exam_date').valueAsDate = new Date();
+
+document.getElementById('validateForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; animation: spin 0.7s linear infinite;">progress_activity</span> Tekshirilmoqda...';
+});
+</script>
+{% endblock %}

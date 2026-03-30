@@ -37,3 +37,18 @@ class BarcodeUploadAdmin(ModelAdmin):
     search_fields = ('code', 'uploaded_by__username')
     list_per_page = 50
     readonly_fields = ('code', 'uploaded_by')
+    change_list_template = 'admin/barcode/barcodeupload_changelist.html'
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                'validate/',
+                self.admin_site.admin_view(self.validate_uploads_view),
+                name='users_barcodeupload_validate',
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def validate_uploads_view(self, request):
+        from apps.barcode.views import admin_validate_uploads
+        return admin_validate_uploads(request)

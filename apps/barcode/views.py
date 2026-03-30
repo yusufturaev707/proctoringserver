@@ -236,14 +236,24 @@ def admin_generate_codes(request):
             messages.error(request, "Barcha maydonlarni to'ldiring!")
             return redirect(reverse_url())
 
-        try:
-            start = int(range_start)
-            end = int(range_end)
-        except (ValueError, TypeError):
+        # Faqat raqamlardan iborat ekanligini tekshirish
+        range_start = range_start.strip()
+        range_end = range_end.strip()
+        if not range_start.isdigit() or not range_end.isdigit():
             messages.error(request, "Interval faqat musbat butun son bo'lishi kerak!")
             return redirect(reverse_url())
 
-        if start < 0 or end < 0 or start > end:
+        start = int(range_start)
+        end = int(range_end)
+
+        # Oldidagi 0 larni saqlash uchun uzunlikni aniqlash
+        pad_len = max(len(range_start), len(range_end))
+
+        if pad_len > 20:
+            messages.error(request, "Kod uzunligi 20 ta belgidan oshmasligi kerak!")
+            return redirect(reverse_url())
+
+        if start > end:
             messages.error(request, "Interval noto'g'ri: boshlanish <= tugash bo'lishi kerak!")
             return redirect(reverse_url())
 
@@ -258,18 +268,20 @@ def admin_generate_codes(request):
             messages.error(request, "Imtihon yoki viloyat topilmadi!")
             return redirect(reverse_url())
 
+        # Kodlarni pad bilan generatsiya
+        all_codes = [str(i).zfill(pad_len) for i in range(start, end + 1)]
+
         # Mavjud kodlarni olish (dublikatni oldini olish)
         existing_codes = set(
             BarcodeCode.objects.filter(
                 exam=exam, exam_date=exam_date,
                 smena=smena, region=region,
-                code__in=[str(i) for i in range(start, end + 1)]
+                code__in=all_codes,
             ).values_list('code', flat=True)
         )
 
         new_codes = []
-        for i in range(start, end + 1):
-            code_str = str(i)
+        for code_str in all_codes:
             if code_str not in existing_codes:
                 new_codes.append(BarcodeCode(
                     exam=exam,
@@ -304,3 +316,66 @@ def admin_generate_codes(request):
 def reverse_url():
     from django.urls import reverse
     return reverse('admin:barcode_barcodecode_generate')
+
+
+@staff_member_required
+def admin_validate_uploads(request):
+    """BarcodeUpload larni BarcodeCode jadvaliga solishtirish va is_sent/is_valid yangilash."""
+    if request.method == 'POST':
+        exam_id = request.POST.get('exam')
+        exam_date = request.POST.get('exam_date')
+        smena = request.POST.get('smena')
+        region_id = request.POST.get('region')
+
+        if not all([exam_id, exam_date, smena, region_id]):
+            messages.error(request, "Barcha maydonlarni to'ldiring!")
+            return redirect('admin:users_barcodeupload_validate')
+
+        filter_params = dict(
+            exam_id=exam_id, exam_date=exam_date,
+            smena=smena, region_id=region_id,
+        )
+
+        uploads = BarcodeUpload.objects.filter(**filter_params)
+        if not uploads.exists():
+            messages.warning(request, "Tanlangan parametrlarga mos yuklama topilmadi.")
+            return redirect('admin:users_barcodeupload_validate')
+
+        # BarcodeCode dagi barcha kodlarni set ga olish
+        valid_codes = set(
+            BarcodeCode.objects.filter(**filter_params)
+            .values_list('code', flat=True)
+        )
+
+        valid_count = 0
+        invalid_count = 0
+
+        for upload in uploads:
+            if upload.code in valid_codes:
+                # Kod mavjud — is_valid=True, BarcodeCode.is_sent=True
+                if not upload.is_valid:
+                    upload.is_valid = True
+                    upload.save(update_fields=['is_valid', 'updated_at'])
+                BarcodeCode.objects.filter(
+                    code=upload.code, **filter_params,
+                ).update(is_sent=True)
+                valid_count += 1
+            else:
+                # Kod mavjud emas — is_valid=False
+                if upload.is_valid:
+                    upload.is_valid = False
+                    upload.save(update_fields=['is_valid', 'updated_at'])
+                invalid_count += 1
+
+        msg = f"Tekshiruv yakunlandi: {valid_count} ta to'g'ri, {invalid_count} ta noto'g'ri."
+        messages.success(request, msg)
+        return redirect('admin:users_barcodeupload_changelist')
+
+    # GET — formani ko'rsatish
+    exams = Test.objects.filter(status=True).order_by('id')
+    regions = Region.objects.filter(status=True).order_by('name')
+    return render(request, 'admin/barcode/validate_uploads.html', {
+        'exams': exams,
+        'regions': regions,
+        'title': 'Barcode yuklamalarni tekshirish',
+    })
