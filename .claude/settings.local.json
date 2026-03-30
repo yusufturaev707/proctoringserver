@@ -19,7 +19,12 @@
       "Bash(mkdir -p C:/Projects/proctoringserver/templates/barcode)",
       "Bash(python manage.py check)",
       "Bash(python manage.py makemigrations barcode)",
-      "Bash(printf \"y\\\\n1\\\\n''''''''\\\\n\")"
+      "Bash(printf \"y\\\\n1\\\\n''''''''\\\\n\")",
+      "Bash(find /c/Projects/proctoringserver -path .venv -prune -o -type f \\\\\\(-name *.js -o -name *.html \\\\\\) -print)",
+      "Bash(find /c/Projects/proctoringserver -path */.venv -prune -o -name urls.py -type f -print)",
+      "Bash(python -c \":*)",
+      "Bash(python -m py_compile apps/barcode/views.py)",
+      "Bash(python -m py_compile apps/barcode/admin.py)"
     ]
   }
 }

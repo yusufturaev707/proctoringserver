@@ -392,6 +392,22 @@
             letter-spacing: 1.5px;
         }
 
+        .result-card.invalid {
+            background: var(--error-bg);
+            border-color: #EF9A9A;
+        }
+
+        .result-card.already-sent {
+            background: #FFF8E1;
+            border-color: #FFE082;
+        }
+
+        .result-card.invalid .icon { background: var(--error); }
+        .result-card.already-sent .icon { background: var(--warning); }
+
+        .result-card.invalid .code { color: var(--error); }
+        .result-card.already-sent .code { color: var(--warning); }
+
         .result-card .label {
             font-size: 11px;
             color: var(--on-surface-muted);
@@ -399,6 +415,15 @@
             letter-spacing: 0.5px;
             margin-bottom: 2px;
         }
+
+        .result-card .status-msg {
+            font-size: 12px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .result-card.invalid .status-msg { color: var(--error); }
+        .result-card.already-sent .status-msg { color: var(--warning); }
 
         .btn-scan-again {
             width: 100%;
@@ -671,13 +696,14 @@
 
                 <!-- RESULT -->
                 <div class="result-section" id="resultSection">
-                    <div class="result-card">
+                    <div class="result-card" id="resultCard">
                         <div class="icon">
-                            <span class="material-icons">verified</span>
+                            <span class="material-icons" id="resultIcon">verified</span>
                         </div>
                         <div>
                             <div class="label">Aniqlangan barcode</div>
                             <div class="code" id="resultCode"></div>
+                            <div class="status-msg" id="resultStatus"></div>
                         </div>
                     </div>
                     <button type="button" class="btn-scan-again" id="btnScanAgain">
@@ -850,6 +876,14 @@ async function tryServerDetect() {
         if (res.ok && data.code) {
             onBarcodeDetected(blob, data);
             return data.code;
+        } else if (!res.ok && data.detail) {
+            // Server barcodeni o'qidi lekin BarcodeCode da topilmadi yoki allaqachon yuborilgan
+            const code = data.detail.match(/"([^"]+)"/)?.[1] || '';
+            if (code) {
+                const isAlreadySent = data.detail.includes('allaqachon yuborilgan');
+                onBarcodeRejected(blob, code, data.detail, isAlreadySent);
+                return code;
+            }
         }
     } catch (err) { /* tarmoq xatosi — davom etadi */ }
     finally {
@@ -859,7 +893,7 @@ async function tryServerDetect() {
     return null;
 }
 
-// Client topsa — backendga faqat saqlash uchun yuborish
+// Client topsa — backendga saqlash va tekshirish uchun yuborish
 async function submitToServer(code, blob) {
     const csrf = document.querySelector('[name=csrfmiddlewaretoken]');
     const formData = new FormData();
@@ -868,6 +902,7 @@ async function submitToServer(code, blob) {
     formData.append('smena', document.getElementById('smena').value);
     formData.append('image', blob, 'barcode_scan.jpg');
 
+    sendingOverlay.classList.add('show');
     try {
         const res = await fetch('{% url "barcode-scan" %}', {
             method: 'POST',
@@ -879,15 +914,17 @@ async function submitToServer(code, blob) {
         if (res.ok) {
             onBarcodeDetected(blob, data);
         } else {
-            // Backend rad etdi (masalan, kod mos kelmadi)
-            showError(data.detail || "Xatolik yuz berdi");
-            isDetected = false;
-            startScanning();
+            // Backend rad etdi — invalid yoki allaqachon yuborilgan
+            const detail = data.detail || "Xatolik yuz berdi";
+            const isAlreadySent = detail.includes('allaqachon yuborilgan');
+            onBarcodeRejected(blob, code, detail, isAlreadySent);
         }
     } catch (err) {
         showError("Tarmoq xatosi");
         isDetected = false;
         startScanning();
+    } finally {
+        sendingOverlay.classList.remove('show');
     }
 }
 
@@ -969,7 +1006,7 @@ function setScanStatus(type, text) {
     scanStatusText.textContent = text;
 }
 
-// ===== ON BARCODE DETECTED =====
+// ===== ON BARCODE DETECTED (valid) =====
 function onBarcodeDetected(blob, data) {
     isDetected = true;
     stopScanning();
@@ -981,8 +1018,12 @@ function onBarcodeDetected(blob, data) {
     scannerArea.style.display = 'none';
     previewContainer.classList.add('show');
 
-    // Natija
+    // Result card — success
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card';
+    document.getElementById('resultIcon').textContent = 'verified';
     document.getElementById('resultCode').textContent = data.code;
+    document.getElementById('resultStatus').textContent = '';
     resultSection.classList.add('show');
 
     scanFrame.classList.add('detected');
@@ -992,12 +1033,41 @@ function onBarcodeDetected(blob, data) {
     if (data.stats) updateStatsUI(data.stats);
 }
 
+// ===== ON BARCODE REJECTED (invalid / already sent) =====
+function onBarcodeRejected(blob, code, detail, isAlreadySent) {
+    isDetected = true;
+    stopScanning();
+
+    // Preview
+    if (blob instanceof Blob) {
+        previewImage.src = URL.createObjectURL(blob);
+    }
+    scannerArea.style.display = 'none';
+    previewContainer.classList.add('show');
+
+    // Result card — error state
+    const card = document.getElementById('resultCard');
+    card.className = 'result-card ' + (isAlreadySent ? 'already-sent' : 'invalid');
+    document.getElementById('resultIcon').textContent = isAlreadySent ? 'history' : 'cancel';
+    document.getElementById('resultCode').textContent = code;
+    document.getElementById('resultStatus').textContent = detail;
+    resultSection.classList.add('show');
+
+    stopCamera();
+    showError(detail);
+
+    // Stats ni yuklash
+    loadStats();
+}
+
 // ===== SCAN AGAIN =====
 document.getElementById('btnScanAgain').addEventListener('click', () => {
     isDetected = false;
     scanFrame.classList.remove('detected');
     previewContainer.classList.remove('show');
     resultSection.classList.remove('show');
+    document.getElementById('resultCard').className = 'result-card';
+    document.getElementById('resultStatus').textContent = '';
     scannerArea.style.display = '';
 
     startCamera().then(() => startScanning());

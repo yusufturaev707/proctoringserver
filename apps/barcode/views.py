@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
 from django.db import IntegrityError
 import cv2
 import numpy as np
@@ -9,6 +11,7 @@ import zxingcpp
 from apps.barcode.forms import BarcodeUploadForm
 from apps.barcode.models import BarcodeCode
 from apps.exams.models import Test
+from apps.regions.models import Region
 from apps.users.models import BarcodeUpload
 
 
@@ -111,27 +114,37 @@ def barcode_scan(request):
                 smena = form.cleaned_data['smena']
 
                 # BarcodeCode da bor-yo'qligini tekshirish
-                # barcode_code = BarcodeCode.objects.filter(
-                #     code=code,
-                #     exam=exam,
-                #     exam_date=exam_date,
-                #     smena=smena,
-                #     region=user_region,
-                # ).first()
-                #
-                # if not barcode_code:
-                #     return JsonResponse({
-                #         'detail': f'Kod "{code}" tanlangan parametrlarga mos kelmadi.'
-                #     }, status=400)
-                #
-                # if barcode_code.is_sent:
-                #     return JsonResponse({
-                #         'detail': f'Kod "{code}" allaqachon yuborilgan.'
-                #     }, status=400)
+                barcode_code = BarcodeCode.objects.filter(
+                    code=code,
+                    exam=exam,
+                    exam_date=exam_date,
+                    smena=smena,
+                    region=user_region,
+                ).first()
+
+                if not barcode_code:
+                    # BarcodeUpload ga is_valid=False bilan saqlash
+                    BarcodeUpload.objects.update_or_create(
+                        uploaded_by=request.user,
+                        exam=exam,
+                        exam_date=exam_date,
+                        smena=smena,
+                        region=user_region,
+                        code=code,
+                        defaults={'image': image_file, 'is_valid': False}
+                    )
+                    return JsonResponse({
+                        'detail': f'Kod "{code}" mavjud emas!'
+                    }, status=400)
+
+                if barcode_code.is_sent:
+                    return JsonResponse({
+                        'detail': f'Kod "{code}" allaqachon yuborilgan.'
+                    }, status=400)
 
                 # BarcodeCode ni is_sent=True qilish
-                # barcode_code.is_sent = True
-                # barcode_code.save(update_fields=['is_sent', 'updated_at'])
+                barcode_code.is_sent = True
+                barcode_code.save(update_fields=['is_sent', 'updated_at'])
 
                 # BarcodeUpload ga saqlash (is_valid=True)
                 obj, created = BarcodeUpload.objects.update_or_create(
@@ -150,8 +163,7 @@ def barcode_scan(request):
                     smena=smena, region=user_region,
                 )
                 total = BarcodeCode.objects.filter(**filter_params).count()
-                # sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
-                sent = BarcodeUpload.objects.filter(**filter_params).count()
+                sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
                 remaining = total - sent
 
                 msg = "Muvaffaqiyatli yuklandi" if created else "Muvaffaqiyatli yangilandi"
@@ -162,8 +174,7 @@ def barcode_scan(request):
                     'stats': {
                         'total': total,
                         'sent': sent,
-                        # 'remaining': remaining,
-                        'remaining': 0,
+                        'remaining': remaining,
                     }
                 }, status=200)
 
@@ -208,3 +219,88 @@ def barcode_stats(request):
         'sent': sent,
         'remaining': total - sent,
     })
+
+
+@staff_member_required
+def admin_generate_codes(request):
+    """Admin panelda BarcodeCode larni interval bo'yicha generate qilish."""
+    if request.method == 'POST':
+        exam_id = request.POST.get('exam')
+        exam_date = request.POST.get('exam_date')
+        smena = request.POST.get('smena')
+        region_id = request.POST.get('region')
+        range_start = request.POST.get('range_start')
+        range_end = request.POST.get('range_end')
+
+        if not all([exam_id, exam_date, smena, region_id, range_start, range_end]):
+            messages.error(request, "Barcha maydonlarni to'ldiring!")
+            return redirect(reverse_url())
+
+        try:
+            start = int(range_start)
+            end = int(range_end)
+        except (ValueError, TypeError):
+            messages.error(request, "Interval faqat musbat butun son bo'lishi kerak!")
+            return redirect(reverse_url())
+
+        if start < 0 or end < 0 or start > end:
+            messages.error(request, "Interval noto'g'ri: boshlanish <= tugash bo'lishi kerak!")
+            return redirect(reverse_url())
+
+        if end - start + 1 > 100000:
+            messages.error(request, "Bir martada 100 000 dan ortiq kod yaratish mumkin emas!")
+            return redirect(reverse_url())
+
+        exam = Test.objects.filter(id=exam_id).first()
+        region = Region.objects.filter(id=region_id).first()
+
+        if not exam or not region:
+            messages.error(request, "Imtihon yoki viloyat topilmadi!")
+            return redirect(reverse_url())
+
+        # Mavjud kodlarni olish (dublikatni oldini olish)
+        existing_codes = set(
+            BarcodeCode.objects.filter(
+                exam=exam, exam_date=exam_date,
+                smena=smena, region=region,
+                code__in=[str(i) for i in range(start, end + 1)]
+            ).values_list('code', flat=True)
+        )
+
+        new_codes = []
+        for i in range(start, end + 1):
+            code_str = str(i)
+            if code_str not in existing_codes:
+                new_codes.append(BarcodeCode(
+                    exam=exam,
+                    exam_date=exam_date,
+                    smena=smena,
+                    region=region,
+                    code=code_str,
+                ))
+
+        if new_codes:
+            BarcodeCode.objects.bulk_create(new_codes)
+
+        created_count = len(new_codes)
+        skipped_count = (end - start + 1) - created_count
+        msg = f"{created_count} ta kod yaratildi."
+        if skipped_count > 0:
+            msg += f" {skipped_count} ta allaqachon mavjud bo'lgani o'tkazib yuborildi."
+        messages.success(request, msg)
+
+        return redirect('admin:barcode_barcodecode_changelist')
+
+    # GET — formani ko'rsatish
+    exams = Test.objects.filter(status=True).order_by('id')
+    regions = Region.objects.filter(status=True).order_by('name')
+    return render(request, 'admin/barcode/generate_codes.html', {
+        'exams': exams,
+        'regions': regions,
+        'title': 'Barcode kodlar generatsiya qilish',
+    })
+
+
+def reverse_url():
+    from django.urls import reverse
+    return reverse('admin:barcode_barcodecode_generate')

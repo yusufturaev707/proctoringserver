@@ -1,0 +1,400 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}Barcode kodlar generatsiya qilish{% endblock %}
+
+{% block content %}
+<style>
+    .gen-container {
+        max-width: 640px;
+        margin: 24px auto;
+        padding: 0 16px;
+    }
+
+    .gen-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        overflow: hidden;
+    }
+
+    .gen-header {
+        background: linear-gradient(135deg, #1565C0, #1E88E5);
+        padding: 24px;
+        color: #fff;
+    }
+
+    .gen-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .gen-header p {
+        margin: 8px 0 0;
+        font-size: 13px;
+        opacity: 0.85;
+    }
+
+    .gen-body {
+        padding: 24px;
+    }
+
+    .gen-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .gen-row.full {
+        grid-template-columns: 1fr;
+    }
+
+    .gen-field {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .gen-field label {
+        font-size: 12px;
+        font-weight: 500;
+        color: #757575;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .gen-field select,
+    .gen-field input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #E0E0E0;
+        border-radius: 10px;
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background: #fff;
+        color: #212121;
+        -webkit-appearance: none;
+    }
+
+    .gen-field select {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='%23757575' d='M0 0l4 5 4-5z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+    }
+
+    .gen-field select:focus,
+    .gen-field input:focus {
+        border-color: #1565C0;
+        box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+    }
+
+    .gen-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 20px 0;
+        color: #9E9E9E;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .gen-divider::before,
+    .gen-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #E0E0E0;
+    }
+
+    .gen-range-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 12px;
+        align-items: end;
+        margin-bottom: 20px;
+    }
+
+    .gen-range-sep {
+        padding-bottom: 14px;
+        color: #757575;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .gen-info {
+        background: #E3F2FD;
+        border: 1px solid #BBDEFB;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 13px;
+        color: #1565C0;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .gen-info .material-symbols-outlined {
+        font-size: 20px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .gen-preview {
+        display: none;
+        background: #F5F5F5;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #424242;
+    }
+
+    .gen-preview.show {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .gen-preview strong {
+        font-size: 18px;
+        color: #1565C0;
+    }
+
+    .gen-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .gen-btn {
+        padding: 12px 28px;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        font-family: 'Roboto', sans-serif;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .gen-btn-cancel {
+        background: #F5F5F5;
+        color: #757575;
+    }
+
+    .gen-btn-cancel:hover {
+        background: #EEEEEE;
+    }
+
+    .gen-btn-submit {
+        background: #1565C0;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3);
+    }
+
+    .gen-btn-submit:hover {
+        background: #1E88E5;
+        box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4);
+    }
+
+    .gen-btn-submit:disabled {
+        background: #BDBDBD;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    /* Messages */
+    .gen-messages {
+        margin-bottom: 16px;
+    }
+
+    .gen-msg {
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .gen-msg-success {
+        background: #E8F5E9;
+        color: #2E7D32;
+        border: 1px solid #A5D6A7;
+    }
+
+    .gen-msg-error {
+        background: #FFEBEE;
+        color: #C62828;
+        border: 1px solid #EF9A9A;
+    }
+
+    @media (max-width: 480px) {
+        .gen-row {
+            grid-template-columns: 1fr;
+        }
+        .gen-range-row {
+            grid-template-columns: 1fr;
+        }
+        .gen-range-sep {
+            text-align: center;
+            padding-bottom: 0;
+        }
+        .gen-actions {
+            flex-direction: column;
+        }
+        .gen-btn {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="gen-container">
+    {% if messages %}
+    <div class="gen-messages">
+        {% for message in messages %}
+        <div class="gen-msg {% if message.tags == 'success' %}gen-msg-success{% else %}gen-msg-error{% endif %}">
+            <span class="material-symbols-outlined" style="font-size: 18px;">
+                {% if message.tags == 'success' %}check_circle{% else %}error{% endif %}
+            </span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="gen-card">
+        <div class="gen-header">
+            <h2>
+                <span class="material-symbols-outlined">playlist_add</span>
+                Barcode kodlar generatsiya qilish
+            </h2>
+            <p>Tanlangan parametrlar bo'yicha interval ichidagi barcha kodlarni yaratish</p>
+        </div>
+        <div class="gen-body">
+            <form method="post" id="generateForm">
+                {% csrf_token %}
+
+                <div class="gen-row">
+                    <div class="gen-field">
+                        <label for="exam">Imtihon</label>
+                        <select name="exam" id="exam" required>
+                            <option value="" disabled selected>Tanlang...</option>
+                            {% for exam in exams %}
+                            <option value="{{ exam.id }}">{{ exam.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="gen-field">
+                        <label for="region">Viloyat</label>
+                        <select name="region" id="region" required>
+                            <option value="" disabled selected>Tanlang...</option>
+                            {% for region in regions %}
+                            <option value="{{ region.id }}">{{ region.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gen-row">
+                    <div class="gen-field">
+                        <label for="exam_date">Imtihon sanasi</label>
+                        <input type="date" name="exam_date" id="exam_date" required>
+                    </div>
+                    <div class="gen-field">
+                        <label for="smena">Smena</label>
+                        <select name="smena" id="smena" required>
+                            <option value="" disabled selected>--</option>
+                            <option value="1">1-smena</option>
+                            <option value="2">2-smena</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gen-divider">Kod intervali</div>
+
+                <div class="gen-range-row">
+                    <div class="gen-field">
+                        <label for="range_start">Boshlanishi</label>
+                        <input type="number" name="range_start" id="range_start"
+                               min="0" placeholder="masalan: 1001" required>
+                    </div>
+                    <div class="gen-range-sep">&mdash;</div>
+                    <div class="gen-field">
+                        <label for="range_end">Tugashi</label>
+                        <input type="number" name="range_end" id="range_end"
+                               min="0" placeholder="masalan: 2000" required>
+                    </div>
+                </div>
+
+                <div class="gen-info">
+                    <span class="material-symbols-outlined">info</span>
+                    <span>Intervaldagi barcha sonlar (boshlanish va tugash ham kiritilgan holda) alohida barcode kod sifatida saqlanadi. Mavjud kodlar dublikat bo'lmaydi.</span>
+                </div>
+
+                <div class="gen-preview" id="preview">
+                    <span class="material-symbols-outlined" style="font-size: 22px; color: #1565C0;">data_array</span>
+                    <span>Jami yaratiladi: <strong id="previewCount">0</strong> ta kod</span>
+                </div>
+
+                <div class="gen-actions">
+                    <a href="{% url 'admin:barcode_barcodecode_changelist' %}" class="gen-btn gen-btn-cancel">
+                        Bekor qilish
+                    </a>
+                    <button type="submit" class="gen-btn gen-btn-submit" id="submitBtn">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
+                        Generatsiya qilish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const rangeStart = document.getElementById('range_start');
+const rangeEnd = document.getElementById('range_end');
+const preview = document.getElementById('preview');
+const previewCount = document.getElementById('previewCount');
+
+function updatePreview() {
+    const s = parseInt(rangeStart.value);
+    const e = parseInt(rangeEnd.value);
+    if (!isNaN(s) && !isNaN(e) && s >= 0 && e >= s) {
+        const count = e - s + 1;
+        previewCount.textContent = count.toLocaleString();
+        preview.classList.add('show');
+    } else {
+        preview.classList.remove('show');
+    }
+}
+
+rangeStart.addEventListener('input', updatePreview);
+rangeEnd.addEventListener('input', updatePreview);
+
+// Set today's date
+document.getElementById('exam_date').valueAsDate = new Date();
+
+// Prevent double submit
+document.getElementById('generateForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; animation: spin 0.7s linear infinite;">progress_activity</span> Yaratilmoqda...';
+});
+</script>
+{% endblock %}

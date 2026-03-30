@@ -1,0 +1,22 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+    <a href="{% url 'admin:barcode_barcodecode_generate' %}" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: #1565C0;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background 0.2s;
+    " onmouseover="this.style.background='#1E88E5'" onmouseout="this.style.background='#1565C0'">
+        <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
+        Kodlar generatsiya qilish
+    </a>
+    {{ block.super }}
+{% endblock %}

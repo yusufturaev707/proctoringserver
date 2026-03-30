@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.urls import path, reverse
+from django.shortcuts import redirect
+from django.utils.html import format_html
 from unfold.admin import ModelAdmin
 from apps.barcode.models import BarcodeCode
 from apps.users.models import BarcodeUpload
@@ -10,6 +13,21 @@ class BarcodeCodeAdmin(ModelAdmin):
     list_filter = ('exam', 'exam_date', 'smena', 'region', 'is_sent')
     search_fields = ('code',)
     list_per_page = 50
+    change_list_template = 'admin/barcode/barcodecode_changelist.html'
+
+    def get_urls(self):
+        custom_urls = [
+            path(
+                'generate/',
+                self.admin_site.admin_view(self.generate_codes_view),
+                name='barcode_barcodecode_generate',
+            ),
+        ]
+        return custom_urls + super().get_urls()
+
+    def generate_codes_view(self, request):
+        from apps.barcode.views import admin_generate_codes
+        return admin_generate_codes(request)
 
 
 @admin.register(BarcodeUpload)
