@@ -55,12 +55,20 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
 
 
+def barcode_upload_path(instance, filename):
+    import time
+    ext = filename.rsplit('.', 1)[-1] if '.' in filename else 'jpg'
+    user_id = instance.uploaded_by_id or 0
+    name = f"{int(time.time())}_{user_id}.{ext}"
+    return f"barcodes/{name}"
+
+
 class BarcodeUpload(BaseModel):
     exam = models.ForeignKey('exams.Test', on_delete=models.CASCADE, blank=True)
     exam_date = models.DateField()
     smena = models.IntegerField()
     region = models.ForeignKey("regions.Region", on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="barcodes/", blank=True, null=True)
+    image = models.ImageField(upload_to=barcode_upload_path, blank=True, null=True)
     uploaded_by = models.ForeignKey("users.User", on_delete=models.CASCADE)
     code = models.BigIntegerField()
     is_valid = models.BooleanField(default=False)
