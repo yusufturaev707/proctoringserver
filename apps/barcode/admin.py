@@ -55,11 +55,23 @@ class BarcodeCodeAdmin(ModelAdmin):
 
 @admin.register(BarcodeUpload)
 class BarcodeUploadAdmin(ModelAdmin):
-    list_display = ('code', 'exam', 'exam_date', 'smena', 'region', 'uploaded_by', 'is_valid')
+    list_display = ('image_preview', 'code', 'exam', 'exam_date', 'smena', 'region', 'uploaded_by', 'is_valid')
     list_filter = ('exam', DatePickerFilter, 'smena', 'region', 'is_valid')
     search_fields = ('code', 'uploaded_by__username')
     list_per_page = 50
-    readonly_fields = ('code', 'uploaded_by')
+    readonly_fields = ('code', 'uploaded_by', 'image_preview_large')
+
+    @admin.display(description='Rasm')
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height:40px; border-radius:4px;" />', obj.image.url)
+        return '-'
+
+    @admin.display(description='Rasm')
+    def image_preview_large(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="max-height:300px; border-radius:8px;" />', obj.image.url)
+        return '-'
     change_list_template = 'admin/barcode/barcodeupload_changelist.html'
 
     def get_urls(self):
