@@ -1,0 +1,30 @@
+{% load i18n %}
+<h3>{% blocktrans with filter_title=title %} {{ filter_title }} {% endblocktrans %}</h3>
+{% for choice in choices %}
+<ul>
+    <li{% if choice.selected %} class="selected"{% endif %}>
+        <a href="{{ choice.query_string }}">Barchasi</a>
+    </li>
+</ul>
+<div style="padding: 5px 10px;">
+    <input type="date"
+           id="datepicker-filter"
+           value="{{ choice.value }}"
+           style="width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px;">
+</div>
+{% endfor %}
+<script>
+(function() {
+    const input = document.getElementById('datepicker-filter');
+    input.addEventListener('change', function() {
+        const val = this.value;
+        const params = new URLSearchParams(window.location.search);
+        if (val) {
+            params.set('exam_date', val);
+        } else {
+            params.delete('exam_date');
+        }
+        window.location.search = params.toString();
+    });
+})();
+</script>

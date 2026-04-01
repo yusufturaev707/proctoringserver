@@ -7,10 +7,33 @@ from apps.barcode.models import BarcodeCode
 from apps.users.models import BarcodeUpload
 
 
+class DatePickerFilter(admin.SimpleListFilter):
+    title = 'Sana'
+    parameter_name = 'exam_date'
+    template = 'admin/barcode/datepicker_filter.html'
+
+    def lookups(self, request, model_admin):
+        return (('custom', 'Sana tanlang'),)
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value and value != 'custom':
+            return queryset.filter(exam_date=value)
+        return queryset
+
+    def choices(self, changelist):
+        yield {
+            'selected': self.value() is None,
+            'query_string': changelist.get_query_string(remove=[self.parameter_name]),
+            'display': 'Barchasi',
+            'value': self.value() or '',
+        }
+
+
 @admin.register(BarcodeCode)
 class BarcodeCodeAdmin(ModelAdmin):
     list_display = ('code', 'exam', 'exam_date', 'smena', 'region', 'is_sent')
-    list_filter = ('exam', 'exam_date', 'smena', 'region', 'is_sent')
+    list_filter = ('exam', DatePickerFilter, 'smena', 'region', 'is_sent')
     search_fields = ('code',)
     list_per_page = 50
     change_list_template = 'admin/barcode/barcodecode_changelist.html'
@@ -33,7 +56,7 @@ class BarcodeCodeAdmin(ModelAdmin):
 @admin.register(BarcodeUpload)
 class BarcodeUploadAdmin(ModelAdmin):
     list_display = ('code', 'exam', 'exam_date', 'smena', 'region', 'uploaded_by', 'is_valid')
-    list_filter = ('exam', 'exam_date', 'smena', 'region', 'is_valid')
+    list_filter = ('exam', DatePickerFilter, 'smena', 'region', 'is_valid')
     search_fields = ('code', 'uploaded_by__username')
     list_per_page = 50
     readonly_fields = ('code', 'uploaded_by')
