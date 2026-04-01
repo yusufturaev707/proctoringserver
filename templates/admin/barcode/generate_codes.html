@@ -331,15 +331,15 @@
                 <div class="gen-range-row">
                     <div class="gen-field">
                         <label for="range_start">Boshlanishi</label>
-                        <input type="text" name="range_start" id="range_start"
-                               pattern="\d+" inputmode="numeric"
-                               placeholder="masalan: 0001" required>
+                        <input type="number" name="range_start" id="range_start"
+                               min="0" inputmode="numeric"
+                               placeholder="masalan: 1" required>
                     </div>
                     <div class="gen-range-sep">&mdash;</div>
                     <div class="gen-field">
                         <label for="range_end">Tugashi</label>
-                        <input type="text" name="range_end" id="range_end"
-                               pattern="\d+" inputmode="numeric"
+                        <input type="number" name="range_end" id="range_end"
+                               min="0" inputmode="numeric"
                                placeholder="masalan: 2000" required>
                     </div>
                 </div>
@@ -385,12 +385,9 @@ function updatePreview() {
     const e = parseInt(ev, 10);
     if (s >= 0 && e >= s) {
         const count = e - s + 1;
-        const pad = Math.max(sv.length, ev.length);
-        const first = String(s).padStart(pad, '0');
-        const last = String(e).padStart(pad, '0');
         previewCount.textContent = count.toLocaleString();
         preview.querySelector('span:last-child').innerHTML =
-            `Jami yaratiladi: <strong>${count.toLocaleString()}</strong> ta kod (${first} ... ${last})`;
+            `Jami yaratiladi: <strong>${count.toLocaleString()}</strong> ta kod (${s} ... ${e})`;
         preview.classList.add('show');
     } else {
         preview.classList.remove('show');

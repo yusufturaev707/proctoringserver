@@ -7,7 +7,7 @@ class BarcodeCode(BaseModel):
     exam_date = models.DateField()
     smena = models.IntegerField()
     region = models.ForeignKey('regions.Region', on_delete=models.CASCADE)
-    code = models.CharField(max_length=50)
+    code = models.BigIntegerField()
     is_sent = models.BooleanField(default=False)
 
     def __str__(self):

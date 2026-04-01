@@ -109,6 +109,14 @@ def barcode_scan(request):
                         {'detail': 'Rasmda barcode topilmadi.'}, status=400
                     )
 
+                # Barcode qiymatini integer ga tekshirish va convert qilish
+                try:
+                    code = int(code)
+                except (ValueError, TypeError):
+                    return JsonResponse(
+                        {'detail': f'Barcode qiymati "{code}" butun son emas!'}, status=400
+                    )
+
                 exam = form.cleaned_data['exam']
                 exam_date = form.cleaned_data['exam_date']
                 smena = form.cleaned_data['smena']
@@ -246,13 +254,6 @@ def admin_generate_codes(request):
         start = int(range_start)
         end = int(range_end)
 
-        # Oldidagi 0 larni saqlash uchun uzunlikni aniqlash
-        pad_len = max(len(range_start), len(range_end))
-
-        if pad_len > 20:
-            messages.error(request, "Kod uzunligi 20 ta belgidan oshmasligi kerak!")
-            return redirect(reverse_url())
-
         if start > end:
             messages.error(request, "Interval noto'g'ri: boshlanish <= tugash bo'lishi kerak!")
             return redirect(reverse_url())
@@ -268,8 +269,8 @@ def admin_generate_codes(request):
             messages.error(request, "Imtihon yoki viloyat topilmadi!")
             return redirect(reverse_url())
 
-        # Kodlarni pad bilan generatsiya
-        all_codes = [str(i).zfill(pad_len) for i in range(start, end + 1)]
+        # Kodlarni generatsiya (integer sifatida)
+        all_codes = list(range(start, end + 1))
 
         # Mavjud kodlarni olish (dublikatni oldini olish)
         existing_codes = set(
@@ -281,14 +282,14 @@ def admin_generate_codes(request):
         )
 
         new_codes = []
-        for code_str in all_codes:
-            if code_str not in existing_codes:
+        for code_val in all_codes:
+            if code_val not in existing_codes:
                 new_codes.append(BarcodeCode(
                     exam=exam,
                     exam_date=exam_date,
                     smena=smena,
                     region=region,
-                    code=code_str,
+                    code=code_val,
                 ))
 
         if new_codes:

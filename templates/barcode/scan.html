@@ -288,6 +288,23 @@
             animation: pulse 1.2s infinite;
         }
 
+        .btn-resume-scan {
+            margin-left: 8px;
+            padding: 3px 12px;
+            border: 1.5px solid rgba(255,255,255,0.7);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        .btn-resume-scan:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
@@ -670,6 +687,7 @@
                         <div class="scan-status scanning" id="scanStatus">
                             <span class="dot"></span>
                             <span id="scanStatusText">Parametrlarni tanlang</span>
+                            <button type="button" id="btnResumeScan" class="btn-resume-scan" style="display:none;">Qayta boshlash</button>
                         </div>
                     </div>
                     <div class="scanner-controls">
@@ -777,6 +795,10 @@ if (hasBarcodeDetector) {
 // Har 300ms client tekshiradi, 10 marta topilmasa (3s) — backendga yuboradi
 const CLIENT_TRIES_BEFORE_SERVER = 10;
 let clientFailCount = 0;
+
+// Serverga max 10 marta yuboriladi, topilmasa to'xtaydi
+const MAX_SERVER_ATTEMPTS = 10;
+let serverAttemptCount = 0;
 
 // ===== CAMERA =====
 async function startCamera() {
@@ -933,6 +955,7 @@ function startScanning() {
     stopScanning();
     isDetected = false;
     clientFailCount = 0;
+    serverAttemptCount = 0;
 
     if (!paramsReady()) {
         setScanStatus('waiting', 'Parametrlarni tanlang');
@@ -974,7 +997,17 @@ function startScanning() {
 
         if (shouldTryServer && !isSending) {
             clientFailCount = 0;
-            setScanStatus('scanning', 'Server tekshirmoqda...');
+            serverAttemptCount++;
+
+            // Max urinishdan oshsa — to'xtatish
+            if (serverAttemptCount > MAX_SERVER_ATTEMPTS) {
+                stopScanning();
+                setScanStatus('waiting', `Barcode topilmadi (${MAX_SERVER_ATTEMPTS} urinish)`, true);
+                showError(`Tasvirda barcode topilmadi (${MAX_SERVER_ATTEMPTS} marta tekshirildi).`);
+                return;
+            }
+
+            setScanStatus('scanning', `Server tekshirmoqda... (${serverAttemptCount}/${MAX_SERVER_ATTEMPTS})`);
             const code = await tryServerDetect();
             if (code) return; // onBarcodeDetected ichida chaqirildi
             setScanStatus('scanning', 'Skanerlash...');
@@ -1001,10 +1034,17 @@ function paramsReady() {
         && document.getElementById('smena').value;
 }
 
-function setScanStatus(type, text) {
+const btnResumeScan = document.getElementById('btnResumeScan');
+
+function setScanStatus(type, text, showResume = false) {
     scanStatus.className = 'scan-status ' + type;
     scanStatusText.textContent = text;
+    btnResumeScan.style.display = showResume ? 'inline-block' : 'none';
 }
+
+btnResumeScan.addEventListener('click', () => {
+    startScanning();
+});
 
 // ===== ON BARCODE DETECTED (valid) =====
 function onBarcodeDetected(blob, data) {
