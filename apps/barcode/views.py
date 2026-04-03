@@ -172,7 +172,8 @@ def barcode_scan(request):
                 )
                 # total = BarcodeCode.objects.filter(**filter_params).count()
                 total = 0
-                sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
+                # sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
+                sent = BarcodeUpload.objects.filter(**filter_params).count()
                 # remaining = total - sent
                 remaining = 0
 
