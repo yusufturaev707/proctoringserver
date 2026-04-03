@@ -122,37 +122,37 @@ def barcode_scan(request):
                 smena = form.cleaned_data['smena']
 
                 # BarcodeCode da bor-yo'qligini tekshirish
-                barcode_code = BarcodeCode.objects.filter(
-                    code=code,
-                    exam=exam,
-                    exam_date=exam_date,
-                    smena=smena,
-                    region=user_region,
-                ).first()
-
-                if not barcode_code:
-                    # BarcodeUpload ga is_valid=False bilan saqlash
-                    BarcodeUpload.objects.update_or_create(
-                        uploaded_by=request.user,
-                        exam=exam,
-                        exam_date=exam_date,
-                        smena=smena,
-                        region=user_region,
-                        code=code,
-                        defaults={'image': image_file, 'is_valid': False}
-                    )
-                    return JsonResponse({
-                        'detail': f'Kod "{code}" mavjud emas!'
-                    }, status=400)
-
-                if barcode_code.is_sent:
-                    return JsonResponse({
-                        'detail': f'Kod "{code}" allaqachon yuborilgan.'
-                    }, status=400)
-
-                # BarcodeCode ni is_sent=True qilish
-                barcode_code.is_sent = True
-                barcode_code.save(update_fields=['is_sent', 'updated_at'])
+                # barcode_code = BarcodeCode.objects.filter(
+                #     code=code,
+                #     exam=exam,
+                #     exam_date=exam_date,
+                #     smena=smena,
+                #     region=user_region,
+                # ).first()
+                #
+                # if not barcode_code:
+                #     # BarcodeUpload ga is_valid=False bilan saqlash
+                #     BarcodeUpload.objects.update_or_create(
+                #         uploaded_by=request.user,
+                #         exam=exam,
+                #         exam_date=exam_date,
+                #         smena=smena,
+                #         region=user_region,
+                #         code=code,
+                #         defaults={'image': image_file, 'is_valid': False}
+                #     )
+                #     return JsonResponse({
+                #         'detail': f'Kod "{code}" mavjud emas!'
+                #     }, status=400)
+                #
+                # if barcode_code.is_sent:
+                #     return JsonResponse({
+                #         'detail': f'Kod "{code}" allaqachon yuborilgan.'
+                #     }, status=400)
+                #
+                # # BarcodeCode ni is_sent=True qilish
+                # barcode_code.is_sent = True
+                # barcode_code.save(update_fields=['is_sent', 'updated_at'])
 
                 # BarcodeUpload ga saqlash (is_valid=True)
                 obj, created = BarcodeUpload.objects.update_or_create(
@@ -162,7 +162,7 @@ def barcode_scan(request):
                     smena=smena,
                     region=user_region,
                     code=code,
-                    defaults={'image': image_file, 'is_valid': True}
+                    defaults={'image': image_file, 'is_valid': False}
                 )
 
                 # Statistika: shu parametrlar bo'yicha
@@ -170,9 +170,11 @@ def barcode_scan(request):
                     exam=exam, exam_date=exam_date,
                     smena=smena, region=user_region,
                 )
-                total = BarcodeCode.objects.filter(**filter_params).count()
+                # total = BarcodeCode.objects.filter(**filter_params).count()
+                total = 0
                 sent = BarcodeCode.objects.filter(**filter_params, is_sent=True).count()
-                remaining = total - sent
+                # remaining = total - sent
+                remaining = 0
 
                 msg = "Muvaffaqiyatli yuklandi" if created else "Muvaffaqiyatli yangilandi"
                 return JsonResponse({
