@@ -615,6 +615,12 @@
         Barcode Scanner
     </div>
     <div class="app-bar-actions">
+        {% if user.region %}
+        <div class="user-chip" style="background: rgba(255,255,255,0.25);">
+            <span class="material-icons">location_on</span>
+            <span>{{ user.region.name }}</span>
+        </div>
+        {% endif %}
         <div class="user-chip">
             <span class="material-icons">person</span>
             <span>{{ user.username }}</span>
